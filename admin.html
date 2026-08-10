@@ -1,0 +1,1007 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Six Stars — Admin</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#07080f;--panel:#0d0f1a;--card:#11141f;--border:rgba(255,255,255,0.08);
+  --gold:#c8860a;--gold-lt:#d4a843;--white:#fff;--muted:rgba(255,255,255,0.45);
+  --green:#22c55e;--red:#f85149;--blue:#58a6ff;--sidebar:220px;
+}
+html,body{height:100%;background:var(--bg);color:var(--white);font-family:'Inter',system-ui,sans-serif;font-size:14px;-webkit-font-smoothing:antialiased}
+
+/* ── GATE ── */
+#gate{position:fixed;inset:0;z-index:999;background:var(--bg);display:flex;align-items:center;justify-content:center}
+.gate-box{width:400px;background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:40px 36px}
+.gate-logo{font-size:1.5rem;font-weight:800;text-align:center;margin-bottom:6px;letter-spacing:-.02em}
+.gate-logo span{color:var(--gold)}
+.gate-sub{font-size:.75rem;color:var(--muted);text-align:center;margin-bottom:28px;letter-spacing:.08em;text-transform:uppercase}
+.field-lbl{font-size:.65rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:6px;display:block}
+.field-inp{width:100%;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:7px;padding:11px 14px;color:var(--white);font-size:.875rem;outline:none;transition:border-color .2s;margin-bottom:16px}
+.field-inp:focus{border-color:var(--gold)}
+.btn-gold{width:100%;background:var(--gold);color:#fff;border:none;border-radius:7px;padding:13px;font-size:.75rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;transition:background .2s;margin-top:4px}
+.btn-gold:hover{background:var(--gold-lt)}
+.gate-err{font-size:.75rem;color:var(--red);text-align:center;margin-top:10px;min-height:16px}
+
+/* ── SETUP BANNER ── */
+#setup-banner{background:rgba(200,134,10,.15);border:1px solid rgba(200,134,10,.4);border-radius:8px;padding:14px 18px;margin:16px 16px 0;display:flex;align-items:center;gap:12px;font-size:.8rem;line-height:1.5}
+#setup-banner.hidden{display:none}
+#setup-banner strong{color:var(--gold)}
+.setup-dismiss{margin-left:auto;cursor:pointer;color:var(--muted);font-size:1rem;padding:2px 6px;background:none;border:none;color:var(--gold)}
+
+/* ── SHELL ── */
+#shell{display:flex;height:100vh;overflow:hidden}
+
+/* ── SIDEBAR ── */
+#sidebar{width:var(--sidebar);background:var(--panel);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;overflow-y:auto}
+.sb-logo{padding:22px 20px 16px;font-size:1.05rem;font-weight:800;letter-spacing:-.01em;border-bottom:1px solid var(--border)}
+.sb-logo span{color:var(--gold)}
+.sb-section{font-size:.6rem;font-weight:600;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);padding:18px 20px 6px}
+.sb-link{display:flex;align-items:center;gap:10px;padding:9px 20px;font-size:.8rem;font-weight:500;color:var(--muted);cursor:pointer;border-left:3px solid transparent;transition:all .15s;text-decoration:none}
+.sb-link:hover{color:var(--white);background:rgba(255,255,255,.04)}
+.sb-link.active{color:var(--white);border-left-color:var(--gold);background:rgba(200,134,10,.08)}
+.sb-link svg{width:15px;height:15px;flex-shrink:0;opacity:.7}
+.sb-link.active svg{opacity:1}
+.sb-foot{margin-top:auto;padding:16px 20px;border-top:1px solid var(--border)}
+.sb-user{font-size:.72rem;color:var(--muted);margin-bottom:10px}
+.sb-user strong{display:block;color:var(--white);font-size:.8rem;margin-bottom:2px}
+.btn-out{width:100%;background:transparent;border:1px solid var(--border);color:var(--muted);border-radius:6px;padding:8px;font-size:.68rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;transition:all .15s}
+.btn-out:hover{border-color:var(--red);color:var(--red)}
+
+/* ── MAIN ── */
+#main{flex:1;overflow-y:auto;display:flex;flex-direction:column}
+.page-hd{padding:24px 28px 0;border-bottom:1px solid var(--border);padding-bottom:16px;display:flex;align-items:center;justify-content:space-between}
+.page-hd h1{font-size:1.2rem;font-weight:700;letter-spacing:-.02em}
+.page-hd p{font-size:.78rem;color:var(--muted);margin-top:3px}
+.page-body{padding:24px 28px;flex:1}
+
+/* ── STATS CARDS ── */
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px}
+.stat-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:18px 20px}
+.stat-card .label{font-size:.62rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+.stat-card .value{font-size:1.8rem;font-weight:800;letter-spacing:-.03em;line-height:1}
+.stat-card .sub{font-size:.7rem;color:var(--muted);margin-top:5px}
+.stat-card.gold .value{color:var(--gold)}
+.stat-card.green .value{color:var(--green)}
+
+/* ── TABLES ── */
+.section-hd{font-size:.78rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:12px;display:flex;align-items:center;justify-content:space-between}
+.section-hd span{font-size:.7rem;color:var(--gold);cursor:pointer;font-weight:400;text-transform:none;letter-spacing:0}
+.data-table{width:100%;border-collapse:collapse;margin-bottom:28px}
+.data-table th{font-size:.6rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);padding:8px 12px;text-align:left;border-bottom:1px solid var(--border)}
+.data-table td{padding:10px 12px;border-bottom:1px solid rgba(255,255,255,.04);font-size:.8rem;color:var(--white);vertical-align:middle}
+.data-table tr:hover td{background:rgba(255,255,255,.02)}
+.data-table tr:last-child td{border-bottom:none}
+.badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:.62rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
+.badge-pending{background:rgba(200,134,10,.15);color:var(--gold)}
+.badge-approved{background:rgba(34,197,94,.12);color:var(--green)}
+.badge-declined{background:rgba(248,81,73,.12);color:var(--red)}
+.empty-state{text-align:center;padding:40px;color:var(--muted);font-size:.8rem}
+.empty-state strong{display:block;color:var(--white);font-size:1rem;margin-bottom:6px}
+
+/* ── GRID 2 COL ── */
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:20px 22px;margin-bottom:20px}
+.card-hd{font-size:.75rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:16px;display:flex;align-items:center;justify-content:space-between}
+.card-hd .title{color:var(--white);font-size:.9rem;letter-spacing:-.01em;text-transform:none;font-weight:600}
+
+/* ── FORM ELEMENTS ── */
+.form-group{margin-bottom:16px}
+.form-group label{font-size:.62rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:6px}
+.form-inp{width:100%;background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:7px;padding:9px 12px;color:var(--white);font-size:.85rem;font-family:inherit;outline:none;transition:border-color .2s;resize:vertical}
+.form-inp:focus{border-color:var(--gold)}
+textarea.form-inp{min-height:80px}
+.btn-save{background:var(--gold);color:#fff;border:none;border-radius:6px;padding:9px 20px;font-size:.72rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;transition:background .2s}
+.btn-save:hover{background:var(--gold-lt)}
+.btn-save:disabled{opacity:.5;cursor:default}
+.btn-sm{background:transparent;border:1px solid var(--border);color:var(--muted);border-radius:5px;padding:4px 10px;font-size:.65rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;transition:all .15s}
+.btn-sm:hover{border-color:var(--white);color:var(--white)}
+.btn-sm.danger:hover{border-color:var(--red);color:var(--red)}
+.save-msg{font-size:.72rem;color:var(--green);margin-left:10px;opacity:0;transition:opacity .3s}
+.save-msg.show{opacity:1}
+
+/* ── STAR EDITOR ── */
+.star-editor{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.star-block{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:18px}
+.star-block .star-label{font-size:.6rem;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:var(--gold);margin-bottom:10px}
+
+/* ── SETUP SECTION ── */
+.setup-step{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:20px 22px;margin-bottom:16px}
+.setup-step h3{font-size:.9rem;font-weight:600;margin-bottom:8px;display:flex;align-items:center;gap:8px}
+.step-num{width:22px;height:22px;border-radius:50%;background:var(--gold);color:#fff;font-size:.65rem;font-weight:700;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0}
+.setup-step p{font-size:.8rem;color:var(--muted);line-height:1.6;margin-bottom:10px}
+.code-block{background:#0a0c14;border:1px solid var(--border);border-radius:6px;padding:14px;font-family:'Courier New',monospace;font-size:.72rem;color:#a5d6ff;line-height:1.6;overflow-x:auto;white-space:pre}
+.copy-btn{background:rgba(255,255,255,.06);border:1px solid var(--border);color:var(--muted);border-radius:5px;padding:4px 10px;font-size:.65rem;cursor:pointer;margin-top:8px;transition:all .15s}
+.copy-btn:hover{background:rgba(255,255,255,.1);color:var(--white)}
+
+/* ── TABS ── */
+.tabs{display:flex;gap:4px;border-bottom:1px solid var(--border);margin-bottom:22px}
+.tab{padding:8px 16px;font-size:.75rem;font-weight:500;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .15s}
+.tab:hover{color:var(--white)}
+.tab.active{color:var(--white);border-bottom-color:var(--gold)}
+
+/* ── ACTION ROW ── */
+.action-row{display:flex;align-items:center;gap:10px;margin-top:14px}
+
+/* ── TOAST ── */
+#toast{position:fixed;bottom:24px;right:24px;background:#1a1f2e;border:1px solid var(--border);border-radius:8px;padding:12px 18px;font-size:.8rem;z-index:9999;opacity:0;transform:translateY(8px);transition:all .25s;pointer-events:none;max-width:320px}
+#toast.show{opacity:1;transform:translateY(0)}
+#toast.success{border-color:rgba(34,197,94,.4);color:var(--green)}
+#toast.error{border-color:rgba(248,81,73,.4);color:var(--red)}
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar{width:5px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:3px}
+</style>
+</head>
+<body>
+
+<!-- ══ ADMIN GATE ════════════════════════════════ -->
+<div id="gate">
+  <div class="gate-box">
+    <div class="gate-logo">✦ <span>Six Stars</span></div>
+    <div class="gate-sub">Admin Panel</div>
+    <label class="field-lbl" for="a-email">Admin Email</label>
+    <input class="field-inp" id="a-email" type="email" placeholder="admin@company.com" autocomplete="off" onkeydown="if(event.key==='Enter')adminLogin()">
+    <label class="field-lbl" for="a-pass">Password</label>
+    <input class="field-inp" id="a-pass" type="password" placeholder="Admin password" onkeydown="if(event.key==='Enter')adminLogin()">
+    <button class="btn-gold" onclick="adminLogin()">Sign In to Admin ✦</button>
+    <div class="gate-err" id="gate-err"></div>
+  </div>
+</div>
+
+<!-- ══ SHELL ══════════════════════════════════════ -->
+<div id="shell" style="display:none">
+
+  <!-- SETUP BANNER -->
+  <div id="setup-banner" class="hidden">
+    <span>⚠️ <strong>Supabase not configured.</strong> Showing demo data. Go to <strong>Setup</strong> to connect your backend.</span>
+    <button class="setup-dismiss" onclick="document.getElementById('setup-banner').classList.add('hidden')">✕</button>
+  </div>
+
+  <div style="display:flex;height:100%">
+  <!-- SIDEBAR -->
+  <aside id="sidebar">
+    <div class="sb-logo">✦ <span>Six Stars</span><br><small style="font-size:.65rem;font-weight:400;color:var(--muted)">Admin Panel</small></div>
+
+    <div class="sb-section">Reporting</div>
+    <a class="sb-link active" onclick="showSection('dashboard')" id="nav-dashboard">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+      Dashboard
+    </a>
+    <a class="sb-link" onclick="showSection('invitations')" id="nav-invitations">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+      Invitations
+    </a>
+    <a class="sb-link" onclick="showSection('signins')" id="nav-signins">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      Sign-ins
+    </a>
+    <a class="sb-link" onclick="showSection('pageviews')" id="nav-pageviews">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+      Page Views
+    </a>
+    <a class="sb-link" onclick="showSection('editlog')" id="nav-editlog">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+      Edit Log
+    </a>
+
+    <div class="sb-section">Content</div>
+    <a class="sb-link" onclick="showSection('stars-editor')" id="nav-stars-editor">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+      Six Stars
+    </a>
+    <a class="sb-link" onclick="showSection('pathway-editor')" id="nav-pathway-editor">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+      Pathway Steps
+    </a>
+    <a class="sb-link" onclick="showSection('credentials')" id="nav-credentials">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+      Login Credentials
+    </a>
+
+    <div class="sb-section">System</div>
+    <a class="sb-link" onclick="showSection('setup')" id="nav-setup">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93A10 10 0 0 0 4.93 19.07M19.07 4.93l-1.41 1.41M4.93 19.07l1.41-1.41"/></svg>
+      Setup &amp; Config
+    </a>
+
+    <div class="sb-foot">
+      <div class="sb-user"><strong id="admin-name">Admin</strong>Logged in</div>
+      <button class="btn-out" onclick="adminLogout()">Sign Out</button>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <div id="main">
+
+    <!-- ── DASHBOARD ── -->
+    <div id="s-dashboard" class="page-section">
+      <div class="page-hd"><div><h1>Dashboard</h1><p>Overview of Six Stars activity</p></div>
+        <button class="btn-sm" onclick="loadDashboard()">↻ Refresh</button>
+      </div>
+      <div class="page-body">
+        <div class="stats-row">
+          <div class="stat-card"><div class="label">Total Page Views</div><div class="value" id="stat-views">—</div><div class="sub">All time</div></div>
+          <div class="stat-card gold"><div class="label">Invitations</div><div class="value" id="stat-invites">—</div><div class="sub">Requests received</div></div>
+          <div class="stat-card green"><div class="label">Sign-ins</div><div class="value" id="stat-signins">—</div><div class="sub">Total logins</div></div>
+          <div class="stat-card"><div class="label">Last Edit</div><div class="value" style="font-size:1rem;padding-top:6px" id="stat-lastedit">—</div><div class="sub">Content change</div></div>
+        </div>
+
+        <div class="section-hd">Recent Invitations <span onclick="showSection('invitations')">View all →</span></div>
+        <table class="data-table" id="dash-invites-table">
+          <thead><tr><th>Name</th><th>Email</th><th>Date</th><th>Status</th></tr></thead>
+          <tbody id="dash-invites-body"><tr><td colspan="4" class="empty-state">Loading…</td></tr></tbody>
+        </table>
+
+        <div class="section-hd">Recent Sign-ins <span onclick="showSection('signins')">View all →</span></div>
+        <table class="data-table" id="dash-signins-table">
+          <thead><tr><th>Email</th><th>Date &amp; Time</th></tr></thead>
+          <tbody id="dash-signins-body"><tr><td colspan="2" class="empty-state">Loading…</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ── INVITATIONS ── -->
+    <div id="s-invitations" class="page-section" style="display:none">
+      <div class="page-hd"><div><h1>Invitation Requests</h1><p>Everyone who has requested access</p></div>
+        <button class="btn-sm" onclick="loadInvitations()">↻ Refresh</button>
+      </div>
+      <div class="page-body">
+        <table class="data-table">
+          <thead><tr><th>Name</th><th>Email</th><th>Message</th><th>Date</th><th>Status</th><th>Actions</th></tr></thead>
+          <tbody id="invites-body"><tr><td colspan="6" class="empty-state">Loading…</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ── SIGN-INS ── -->
+    <div id="s-signins" class="page-section" style="display:none">
+      <div class="page-hd"><div><h1>Sign-in Log</h1><p>Every successful login to the site</p></div>
+        <button class="btn-sm" onclick="loadSignins()">↻ Refresh</button>
+      </div>
+      <div class="page-body">
+        <table class="data-table">
+          <thead><tr><th>Email</th><th>Date &amp; Time</th><th>Session</th></tr></thead>
+          <tbody id="signins-body"><tr><td colspan="3" class="empty-state">Loading…</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ── PAGE VIEWS ── -->
+    <div id="s-pageviews" class="page-section" style="display:none">
+      <div class="page-hd"><div><h1>Page Views</h1><p>Traffic and visitor data</p></div>
+        <button class="btn-sm" onclick="loadPageviews()">↻ Refresh</button>
+      </div>
+      <div class="page-body">
+        <div class="stats-row" style="grid-template-columns:repeat(3,1fr)">
+          <div class="stat-card"><div class="label">Today</div><div class="value" id="pv-today">—</div></div>
+          <div class="stat-card"><div class="label">This Week</div><div class="value" id="pv-week">—</div></div>
+          <div class="stat-card gold"><div class="label">All Time</div><div class="value" id="pv-all">—</div></div>
+        </div>
+        <div class="section-hd">Recent Visits</div>
+        <table class="data-table">
+          <thead><tr><th>Date &amp; Time</th><th>Referrer</th><th>Browser</th></tr></thead>
+          <tbody id="pageviews-body"><tr><td colspan="3" class="empty-state">Loading…</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ── EDIT LOG ── -->
+    <div id="s-editlog" class="page-section" style="display:none">
+      <div class="page-hd"><div><h1>Content Edit Log</h1><p>Full history of all admin changes</p></div>
+        <button class="btn-sm" onclick="loadEditLog()">↻ Refresh</button>
+      </div>
+      <div class="page-body">
+        <table class="data-table">
+          <thead><tr><th>Date</th><th>Field</th><th>Old Value</th><th>New Value</th><th>By</th></tr></thead>
+          <tbody id="editlog-body"><tr><td colspan="5" class="empty-state">Loading…</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ── SIX STARS EDITOR ── -->
+    <div id="s-stars-editor" class="page-section" style="display:none">
+      <div class="page-hd"><div><h1>Six Stars Content</h1><p>Edit each star's name and description</p></div></div>
+      <div class="page-body">
+        <div class="star-editor" id="stars-editor-grid">
+          <!-- rendered by JS -->
+        </div>
+      </div>
+    </div>
+
+    <!-- ── PATHWAY EDITOR ── -->
+    <div id="s-pathway-editor" class="page-section" style="display:none">
+      <div class="page-hd"><div><h1>Pathway Steps</h1><p>Edit the "Earned, not bought" steps</p></div></div>
+      <div class="page-body" id="pathway-editor-body">
+        <!-- rendered by JS -->
+      </div>
+    </div>
+
+    <!-- ── CREDENTIALS ── -->
+    <div id="s-credentials" class="page-section" style="display:none">
+      <div class="page-hd"><div><h1>Login Credentials</h1><p>Update the site gate email and password</p></div></div>
+      <div class="page-body">
+        <div class="card" style="max-width:500px">
+          <div class="card-hd"><span class="title">Site Gate Credentials</span></div>
+          <p style="font-size:.78rem;color:var(--muted);margin-bottom:20px;line-height:1.6">These are the email and password users enter on the public-facing login gate at sixstars.ai.</p>
+          <div class="form-group">
+            <label>Gate Email</label>
+            <input class="form-inp" id="cred-email" type="email" placeholder="user@example.com">
+          </div>
+          <div class="form-group">
+            <label>Gate Password</label>
+            <input class="form-inp" id="cred-pass" type="text" placeholder="New password">
+          </div>
+          <div class="action-row">
+            <button class="btn-save" onclick="saveCredentials()">Save Credentials</button>
+            <span class="save-msg" id="cred-save-msg">✓ Saved</span>
+          </div>
+          <p style="margin-top:16px;font-size:.72rem;color:var(--muted);line-height:1.6">⚠️ After saving, the index.html on the site must be redeployed with the updated credentials. Use the "Copy index.html patch" button below to get the updated snippet.</p>
+          <button class="btn-sm" style="margin-top:10px" onclick="copyCredPatch()">Copy index.html patch</button>
+        </div>
+
+        <div class="card" style="max-width:500px;margin-top:20px">
+          <div class="card-hd"><span class="title">Admin Panel Password</span></div>
+          <p style="font-size:.78rem;color:var(--muted);margin-bottom:20px;line-height:1.6">Change the password used to access this admin panel.</p>
+          <div class="form-group">
+            <label>Current Admin Password</label>
+            <input class="form-inp" id="admin-cur-pass" type="password" placeholder="Current password">
+          </div>
+          <div class="form-group">
+            <label>New Admin Password</label>
+            <input class="form-inp" id="admin-new-pass" type="password" placeholder="New password">
+          </div>
+          <div class="action-row">
+            <button class="btn-save" onclick="saveAdminPass()">Update Admin Password</button>
+            <span class="save-msg" id="admin-pass-msg">✓ Updated</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── SETUP ── -->
+    <div id="s-setup" class="page-section" style="display:none">
+      <div class="page-hd"><div><h1>Setup &amp; Configuration</h1><p>Connect Supabase to enable live reporting</p></div></div>
+      <div class="page-body" style="max-width:760px">
+
+        <div class="setup-step">
+          <h3><span class="step-num">1</span> Add Your Supabase Anon Key</h3>
+          <p>Find your anon key in the Supabase dashboard → Project Settings → API. Paste it below — it's stored in your browser only.</p>
+          <div class="form-group" style="margin-bottom:10px">
+            <label>Supabase Anon Key</label>
+            <input class="form-inp" id="sb-key-input" type="text" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...">
+          </div>
+          <div class="action-row">
+            <button class="btn-save" onclick="saveSBKey()">Save &amp; Connect</button>
+            <span id="sb-connect-status" style="font-size:.75rem;color:var(--muted);margin-left:10px"></span>
+          </div>
+          <p style="margin-top:10px;font-size:.72rem;color:var(--muted)">Project URL: <code style="color:var(--blue)">https://ldhgxfsklorqzktuodmk.supabase.co</code></p>
+        </div>
+
+        <div class="setup-step">
+          <h3><span class="step-num">2</span> Create Database Tables</h3>
+          <p>Run this SQL in your Supabase SQL Editor (Database → SQL Editor → New Query):</p>
+          <div class="code-block" id="setup-sql">-- Run in Supabase SQL Editor
+
+create table if not exists page_views (
+  id uuid default gen_random_uuid() primary key,
+  created_at timestamptz default now(),
+  referrer text,
+  user_agent text,
+  session_id text
+);
+
+create table if not exists invitation_requests (
+  id uuid default gen_random_uuid() primary key,
+  created_at timestamptz default now(),
+  name text,
+  email text,
+  message text,
+  status text default 'pending'
+);
+
+create table if not exists sign_ins (
+  id uuid default gen_random_uuid() primary key,
+  created_at timestamptz default now(),
+  email text,
+  session_id text
+);
+
+create table if not exists site_content (
+  id uuid default gen_random_uuid() primary key,
+  key text unique not null,
+  value text,
+  updated_at timestamptz default now()
+);
+
+create table if not exists content_edits (
+  id uuid default gen_random_uuid() primary key,
+  created_at timestamptz default now(),
+  content_key text,
+  old_value text,
+  new_value text,
+  admin_email text
+);
+
+create table if not exists admin_config (
+  id uuid default gen_random_uuid() primary key,
+  key text unique not null,
+  value text
+);
+
+-- Enable Row Level Security (anon can insert, admin reads all)
+alter table page_views enable row level security;
+alter table invitation_requests enable row level security;
+alter table sign_ins enable row level security;
+alter table site_content enable row level security;
+alter table content_edits enable row level security;
+alter table admin_config enable row level security;
+
+-- Public insert policies (for tracking)
+create policy "anon insert page_views" on page_views for insert to anon with check (true);
+create policy "anon insert invitations" on invitation_requests for insert to anon with check (true);
+create policy "anon insert sign_ins" on sign_ins for insert to anon with check (true);
+
+-- Public read for site_content (so index.html can load it)
+create policy "anon read site_content" on site_content for select to anon using (true);
+
+-- Authenticated full access
+create policy "auth all page_views" on page_views for all to authenticated using (true);
+create policy "auth all invitations" on invitation_requests for all to authenticated using (true);
+create policy "auth all sign_ins" on sign_ins for all to authenticated using (true);
+create policy "auth all site_content" on site_content for all to authenticated using (true);
+create policy "auth all content_edits" on content_edits for all to authenticated using (true);
+create policy "auth all admin_config" on admin_config for all to authenticated using (true);</div>
+          <button class="copy-btn" onclick="copySQL()">Copy SQL</button>
+        </div>
+
+        <div class="setup-step">
+          <h3><span class="step-num">3</span> Update index.html Tracking</h3>
+          <p>Add this snippet just before the closing <code>&lt;/script&gt;</code> tag in index.html to enable page view, sign-in, and invitation tracking:</p>
+          <div class="code-block">/* ── SUPABASE TRACKING ── */
+const SB_URL = 'https://ldhgxfsklorqzktuodmk.supabase.co';
+const SB_KEY = 'YOUR_ANON_KEY_HERE';
+const _sb = supabase.createClient(SB_URL, SB_KEY);
+const _sid = Math.random().toString(36).slice(2);
+
+// Track page view
+_sb.from('page_views').insert({
+  referrer: document.referrer || null,
+  user_agent: navigator.userAgent,
+  session_id: _sid
+});
+
+// Track sign-in (add inside openSite() after sessionStorage.setItem)
+// _sb.from('sign_ins').insert({ email: email, session_id: _sid });
+
+// Track invitation request (add to invitation form submit)
+// _sb.from('invitation_requests').insert({ name, email, message });</div>
+          <button class="copy-btn" onclick="copyTracking()">Copy Snippet</button>
+        </div>
+
+        <div class="setup-step">
+          <h3><span class="step-num">4</span> Seed Default Content</h3>
+          <p>Click to seed Supabase with the current Six Stars and Pathway content so you can edit it live.</p>
+          <button class="btn-save" onclick="seedContent()">Seed Default Content</button>
+          <span class="save-msg" id="seed-msg">✓ Seeded</span>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /#main -->
+  </div>
+</div><!-- /#shell -->
+
+<div id="toast"></div>
+
+<script>
+/* ══════════════════════════════════════════
+   CONFIG
+══════════════════════════════════════════ */
+const SB_URL = 'https://ldhgxfsklorqzktuodmk.supabase.co';
+let   SB_KEY = localStorage.getItem('ss_admin_sb_key') || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxkaGd4ZnNrbG9ycXprdHVvZG1rIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ5MTg3NTYsImV4cCI6MjEwMDQ5NDc1Nn0.BTOboRCzCa2Mcv8V4kTZjuvNFYbejor1P3dQXXbKRLM';
+
+// Admin credentials (stored in localStorage after first save)
+let ADMIN_EMAIL = localStorage.getItem('ss_admin_email') || 'mikelwalton@outlook.com';
+let ADMIN_PASS  = localStorage.getItem('ss_admin_pass')  || 'SixStarsAdmin2026!';
+
+// Site gate credentials
+let GATE_EMAIL = localStorage.getItem('ss_gate_email') || 'mikelwalton@outlook.com';
+let GATE_PASS  = localStorage.getItem('ss_gate_pass')  || 'Mikel2Day!';
+
+let db = null;
+let currentAdmin = null;
+
+/* ══════════════════════════════════════════
+   DEFAULT CONTENT
+══════════════════════════════════════════ */
+const DEFAULT_STARS = [
+  { key:'star_1', name:'Craft',         desc:'The quality of the work itself. Skills, output, and domain knowledge — assessed and on record.' },
+  { key:'star_2', name:'Integrity',     desc:'Values in action, not just on paper. Ethics scenario assessments — three situations, all three must pass.' },
+  { key:'star_3', name:'Communication', desc:'How you listen, respond, and show up for others — assessed through real scenarios and ongoing interaction data.' },
+  { key:'star_4', name:'Reliability',   desc:'Follow-through, consistency, and dependability — tracked across real commitments and engagements.' },
+  { key:'star_5', name:'Experience',    desc:'The impact you leave on others — measured through structured feedback from the people you work with and serve.' },
+  { key:'star_6', name:'Legacy',        desc:'How you invest in others, give back, and grow beyond yourself — the long-term mark of a person who truly operates at six stars.' },
+];
+const DEFAULT_STEPS = [
+  { key:'step_1', title:'Apply',                    desc:'Submit your application with identity verification and a commitment to the standard.' },
+  { key:'step_2', title:'Complete 6 Training Modules', desc:'Master the behavioral standards across all six dimensions.' },
+  { key:'step_3', title:'Join Your Cohort',         desc:'Train alongside peers and complete real-world scenario assessments.' },
+  { key:'step_4', title:'Pass All Assessments',     desc:'Every dimension is assessed. All six must be passed to earn the badge.' },
+  { key:'step_5', title:'Badge Awarded',            desc:'Your profile goes live and your Six Stars standing begins — maintained through continuous performance.' },
+];
+
+/* ══════════════════════════════════════════
+   INIT
+══════════════════════════════════════════ */
+function initDB() {
+  if (!SB_KEY) return false;
+  try {
+    db = supabase.createClient(SB_URL, SB_KEY);
+    return true;
+  } catch(e) { return false; }
+}
+
+/* ══════════════════════════════════════════
+   ADMIN AUTH
+══════════════════════════════════════════ */
+function adminLogin() {
+  const email = document.getElementById('a-email').value.trim().toLowerCase();
+  const pass  = document.getElementById('a-pass').value;
+  const err   = document.getElementById('gate-err');
+  err.textContent = '';
+  if (!email || !pass) { err.textContent = 'Enter your email and password.'; return; }
+  if (email === ADMIN_EMAIL.toLowerCase() && pass === ADMIN_PASS) {
+    currentAdmin = email;
+    sessionStorage.setItem('ss_admin_session', '1');
+    document.getElementById('gate').style.display = 'none';
+    document.getElementById('shell').style.display = 'block';
+    document.getElementById('admin-name').textContent = email;
+    if (!initDB()) {
+      document.getElementById('setup-banner').classList.remove('hidden');
+    }
+    loadDashboard();
+    renderStarEditor();
+    renderPathwayEditor();
+    loadCredentials();
+    if (SB_KEY) document.getElementById('sb-key-input').value = SB_KEY;
+  } else {
+    err.textContent = 'Incorrect email or password.';
+    document.getElementById('a-pass').value = '';
+  }
+}
+
+function adminLogout() {
+  sessionStorage.removeItem('ss_admin_session');
+  document.getElementById('shell').style.display = 'none';
+  document.getElementById('gate').style.display = 'flex';
+  document.getElementById('a-pass').value = '';
+}
+
+if (sessionStorage.getItem('ss_admin_session')) {
+  currentAdmin = ADMIN_EMAIL;
+  document.getElementById('gate').style.display = 'none';
+  document.getElementById('shell').style.display = 'block';
+  document.getElementById('admin-name').textContent = ADMIN_EMAIL;
+  if (!initDB()) document.getElementById('setup-banner').classList.remove('hidden');
+  loadDashboard();
+  renderStarEditor();
+  renderPathwayEditor();
+  loadCredentials();
+  if (SB_KEY) document.getElementById('sb-key-input').value = SB_KEY;
+}
+
+/* ══════════════════════════════════════════
+   NAVIGATION
+══════════════════════════════════════════ */
+function showSection(name) {
+  document.querySelectorAll('.page-section').forEach(s => s.style.display = 'none');
+  document.querySelectorAll('.sb-link').forEach(l => l.classList.remove('active'));
+  document.getElementById('s-' + name).style.display = 'block';
+  const nav = document.getElementById('nav-' + name);
+  if (nav) nav.classList.add('active');
+  // Lazy load
+  const loaders = {
+    dashboard: loadDashboard, invitations: loadInvitations,
+    signins: loadSignins, pageviews: loadPageviews, editlog: loadEditLog
+  };
+  if (loaders[name]) loaders[name]();
+}
+
+/* ══════════════════════════════════════════
+   DEMO DATA (used when Supabase not configured)
+══════════════════════════════════════════ */
+function demoInvites() {
+  return [
+    { id:1, name:'Sarah Chen', email:'sarah@techco.com', message:'I lead a team of 12 and want to build a six-star culture.', created_at: new Date(Date.now()-86400000*2).toISOString(), status:'pending' },
+    { id:2, name:'Marcus Williams', email:'marcus@founders.io', message:'Building a human-first company.', created_at: new Date(Date.now()-86400000*5).toISOString(), status:'approved' },
+    { id:3, name:'Elena Rodriguez', email:'elena@gm.com', message:'', created_at: new Date(Date.now()-86400000*7).toISOString(), status:'pending' },
+  ];
+}
+function demoSignins() {
+  return [
+    { email:'mikelwalton@outlook.com', created_at: new Date(Date.now()-3600000).toISOString(), session_id:'abc123' },
+    { email:'mikelwalton@outlook.com', created_at: new Date(Date.now()-86400000).toISOString(), session_id:'def456' },
+  ];
+}
+function demoPageviews() {
+  return Array.from({length:8}, (_,i) => ({
+    created_at: new Date(Date.now()-3600000*i*3).toISOString(),
+    referrer: ['(direct)', 'google.com', 'linkedin.com', '(direct)', 'twitter.com'][i%5],
+    user_agent: 'Chrome 126'
+  }));
+}
+function demoEdits() { return []; }
+
+/* ══════════════════════════════════════════
+   LOAD DASHBOARD
+══════════════════════════════════════════ */
+async function loadDashboard() {
+  let invites, signins, views, edits;
+  if (db) {
+    const [ri, rs, rv, re] = await Promise.all([
+      db.from('invitation_requests').select('*').order('created_at',{ascending:false}).limit(5),
+      db.from('sign_ins').select('*').order('created_at',{ascending:false}).limit(5),
+      db.from('page_views').select('count',{count:'exact',head:true}),
+      db.from('content_edits').select('created_at').order('created_at',{ascending:false}).limit(1),
+    ]);
+    invites = ri.data || []; signins = rs.data || [];
+    document.getElementById('stat-views').textContent   = rv.count ?? '—';
+    document.getElementById('stat-invites').textContent = invites.length;
+    document.getElementById('stat-signins').textContent = signins.length;
+    document.getElementById('stat-lastedit').textContent = re.data?.[0]
+      ? fmtDate(re.data[0].created_at) : 'Never';
+  } else {
+    invites = demoInvites().slice(0,5); signins = demoSignins();
+    document.getElementById('stat-views').textContent   = '—';
+    document.getElementById('stat-invites').textContent = '3 (demo)';
+    document.getElementById('stat-signins').textContent = '2 (demo)';
+    document.getElementById('stat-lastedit').textContent = 'Never';
+  }
+  renderInviteRows('dash-invites-body', invites, true);
+  renderSigninRows('dash-signins-body', signins);
+}
+
+/* ══════════════════════════════════════════
+   LOAD INVITATIONS
+══════════════════════════════════════════ */
+async function loadInvitations() {
+  let data = db ? (await db.from('invitation_requests').select('*').order('created_at',{ascending:false})).data || [] : demoInvites();
+  renderInviteRows('invites-body', data, false);
+}
+
+function renderInviteRows(tbodyId, rows, compact) {
+  const tb = document.getElementById(tbodyId);
+  if (!rows.length) { tb.innerHTML = `<tr><td colspan="${compact?4:6}" class="empty-state"><strong>No requests yet</strong>Invitation requests will appear here</td></tr>`; return; }
+  tb.innerHTML = rows.map(r => `
+    <tr>
+      <td>${esc(r.name||'—')}</td>
+      <td><a href="mailto:${esc(r.email)}" style="color:var(--blue)">${esc(r.email)}</a></td>
+      ${compact ? '' : `<td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(r.message||'—')}</td>`}
+      <td style="color:var(--muted)">${fmtDate(r.created_at)}</td>
+      <td><span class="badge badge-${r.status||'pending'}">${r.status||'pending'}</span></td>
+      ${compact ? '' : `<td style="display:flex;gap:6px">
+        <button class="btn-sm" onclick="updateStatus('${r.id}','approved')">Approve</button>
+        <button class="btn-sm danger" onclick="updateStatus('${r.id}','declined')">Decline</button>
+      </td>`}
+    </tr>`).join('');
+}
+
+async function updateStatus(id, status) {
+  if (!db) { toast('Connect Supabase to update status','error'); return; }
+  await db.from('invitation_requests').update({status}).eq('id', id);
+  loadInvitations();
+  toast('Status updated to ' + status);
+}
+
+/* ══════════════════════════════════════════
+   LOAD SIGN-INS
+══════════════════════════════════════════ */
+async function loadSignins() {
+  let data = db ? (await db.from('sign_ins').select('*').order('created_at',{ascending:false}).limit(100)).data || [] : demoSignins();
+  renderSigninRows('signins-body', data);
+}
+
+function renderSigninRows(tbodyId, rows) {
+  const tb = document.getElementById(tbodyId);
+  if (!rows.length) { tb.innerHTML = `<tr><td colspan="3" class="empty-state"><strong>No sign-ins yet</strong>Sign-ins will appear here once tracking is enabled</td></tr>`; return; }
+  tb.innerHTML = rows.map(r => `
+    <tr>
+      <td>${esc(r.email||'—')}</td>
+      <td style="color:var(--muted)">${fmtDate(r.created_at)}</td>
+      <td style="color:var(--muted);font-family:monospace;font-size:.7rem">${(r.session_id||'').slice(0,8)}</td>
+    </tr>`).join('');
+}
+
+/* ══════════════════════════════════════════
+   LOAD PAGE VIEWS
+══════════════════════════════════════════ */
+async function loadPageviews() {
+  let data, total = 0, today = 0, week = 0;
+  if (db) {
+    const res = await db.from('page_views').select('*').order('created_at',{ascending:false}).limit(200);
+    data = res.data || [];
+    total = data.length;
+    const now = Date.now();
+    today = data.filter(r => now - new Date(r.created_at) < 86400000).length;
+    week  = data.filter(r => now - new Date(r.created_at) < 604800000).length;
+  } else {
+    data = demoPageviews(); total = '—'; today = '—'; week = '—';
+  }
+  document.getElementById('pv-today').textContent = today;
+  document.getElementById('pv-week').textContent  = week;
+  document.getElementById('pv-all').textContent   = total;
+  const tb = document.getElementById('pageviews-body');
+  if (!data.length) { tb.innerHTML = `<tr><td colspan="3" class="empty-state"><strong>No visits yet</strong>Add tracking to index.html (see Setup)</td></tr>`; return; }
+  tb.innerHTML = data.map(r => `
+    <tr>
+      <td style="color:var(--muted)">${fmtDate(r.created_at)}</td>
+      <td>${esc(r.referrer||'(direct)')}</td>
+      <td style="color:var(--muted);font-size:.72rem">${(r.user_agent||'').slice(0,60)}</td>
+    </tr>`).join('');
+}
+
+/* ══════════════════════════════════════════
+   LOAD EDIT LOG
+══════════════════════════════════════════ */
+async function loadEditLog() {
+  let data = db ? (await db.from('content_edits').select('*').order('created_at',{ascending:false}).limit(100)).data || [] : [];
+  const tb = document.getElementById('editlog-body');
+  if (!data.length) { tb.innerHTML = `<tr><td colspan="5" class="empty-state"><strong>No edits yet</strong>Content changes will be logged here</td></tr>`; return; }
+  tb.innerHTML = data.map(r => `
+    <tr>
+      <td style="color:var(--muted)">${fmtDate(r.created_at)}</td>
+      <td><code style="color:var(--gold);font-size:.72rem">${esc(r.content_key||'')}</code></td>
+      <td style="color:var(--red);max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(r.old_value||'')}</td>
+      <td style="color:var(--green);max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(r.new_value||'')}</td>
+      <td style="color:var(--muted)">${esc(r.admin_email||'')}</td>
+    </tr>`).join('');
+}
+
+/* ══════════════════════════════════════════
+   SIX STARS EDITOR
+══════════════════════════════════════════ */
+let starContent = {};
+async function renderStarEditor() {
+  // Load from Supabase or defaults
+  if (db) {
+    const keys = DEFAULT_STARS.flatMap(s => [s.key+'_name', s.key+'_desc']);
+    const res = await db.from('site_content').select('*').in('key', keys);
+    (res.data||[]).forEach(r => starContent[r.key] = r.value);
+  }
+  const grid = document.getElementById('stars-editor-grid');
+  grid.innerHTML = DEFAULT_STARS.map((s,i) => `
+    <div class="star-block">
+      <div class="star-label">Star ${i+1}</div>
+      <div class="form-group">
+        <label>Name</label>
+        <input class="form-inp" id="s${i+1}-name" value="${esc(starContent[s.key+'_name'] || s.name)}">
+      </div>
+      <div class="form-group">
+        <label>Description</label>
+        <textarea class="form-inp" id="s${i+1}-desc">${esc(starContent[s.key+'_desc'] || s.desc)}</textarea>
+      </div>
+      <div class="action-row">
+        <button class="btn-save" onclick="saveStar(${i+1},'${s.key}')">Save</button>
+        <span class="save-msg" id="star${i+1}-msg">✓ Saved</span>
+      </div>
+    </div>`).join('');
+}
+
+async function saveStar(num, key) {
+  const name = document.getElementById(`s${num}-name`).value.trim();
+  const desc = document.getElementById(`s${num}-desc`).value.trim();
+  if (!name) { toast('Name cannot be empty','error'); return; }
+  if (db) {
+    const old_name = starContent[key+'_name'] || '';
+    const old_desc = starContent[key+'_desc'] || '';
+    await Promise.all([
+      upsertContent(key+'_name', name, old_name),
+      upsertContent(key+'_desc', desc, old_desc),
+    ]);
+    starContent[key+'_name'] = name;
+    starContent[key+'_desc'] = desc;
+  } else {
+    toast('Connect Supabase to save changes','error'); return;
+  }
+  flashMsg('star'+num+'-msg');
+  toast('Star ' + num + ' saved');
+}
+
+/* ══════════════════════════════════════════
+   PATHWAY EDITOR
+══════════════════════════════════════════ */
+let stepContent = {};
+async function renderPathwayEditor() {
+  if (db) {
+    const keys = DEFAULT_STEPS.flatMap(s => [s.key+'_title', s.key+'_desc']);
+    const res = await db.from('site_content').select('*').in('key', keys);
+    (res.data||[]).forEach(r => stepContent[r.key] = r.value);
+  }
+  const body = document.getElementById('pathway-editor-body');
+  body.innerHTML = DEFAULT_STEPS.map((s,i) => `
+    <div class="card">
+      <div class="card-hd">
+        <span class="title">Step ${i+1}</span>
+        <span style="font-size:.7rem;color:var(--muted)">${esc(stepContent[s.key+'_title'] || s.title)}</span>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+        <div class="form-group">
+          <label>Title</label>
+          <input class="form-inp" id="p${i+1}-title" value="${esc(stepContent[s.key+'_title'] || s.title)}">
+        </div>
+        <div class="form-group">
+          <label>Description</label>
+          <textarea class="form-inp" id="p${i+1}-desc">${esc(stepContent[s.key+'_desc'] || s.desc)}</textarea>
+        </div>
+      </div>
+      <div class="action-row">
+        <button class="btn-save" onclick="saveStep(${i+1},'${s.key}')">Save Step ${i+1}</button>
+        <span class="save-msg" id="step${i+1}-msg">✓ Saved</span>
+      </div>
+    </div>`).join('');
+}
+
+async function saveStep(num, key) {
+  const title = document.getElementById(`p${num}-title`).value.trim();
+  const desc  = document.getElementById(`p${num}-desc`).value.trim();
+  if (!title) { toast('Title cannot be empty','error'); return; }
+  if (db) {
+    await Promise.all([
+      upsertContent(key+'_title', title, stepContent[key+'_title']||''),
+      upsertContent(key+'_desc',  desc,  stepContent[key+'_desc']||''),
+    ]);
+    stepContent[key+'_title'] = title;
+    stepContent[key+'_desc']  = desc;
+  } else {
+    toast('Connect Supabase to save changes','error'); return;
+  }
+  flashMsg('step'+num+'-msg');
+  toast('Step ' + num + ' saved');
+}
+
+/* ══════════════════════════════════════════
+   CREDENTIALS
+══════════════════════════════════════════ */
+function loadCredentials() {
+  document.getElementById('cred-email').value = GATE_EMAIL;
+  document.getElementById('cred-pass').value  = GATE_PASS;
+}
+
+async function saveCredentials() {
+  const email = document.getElementById('cred-email').value.trim();
+  const pass  = document.getElementById('cred-pass').value.trim();
+  if (!email || !pass) { toast('Email and password are required','error'); return; }
+  GATE_EMAIL = email; GATE_PASS = pass;
+  localStorage.setItem('ss_gate_email', email);
+  localStorage.setItem('ss_gate_pass', pass);
+  if (db) {
+    await Promise.all([
+      upsertContent('gate_email', email, ''),
+      upsertContent('gate_pass', pass, ''),
+    ]);
+  }
+  flashMsg('cred-save-msg');
+  toast('Credentials saved. Redeploy index.html to apply.');
+}
+
+function copyCredPatch() {
+  const email = document.getElementById('cred-email').value.trim();
+  const pass  = document.getElementById('cred-pass').value.trim();
+  const patch = `var VALID_EMAIL = '${email}';\nvar VALID_PASS  = '${pass}';`;
+  navigator.clipboard.writeText(patch).then(() => toast('Patch copied — replace those two lines in index.html'));
+}
+
+async function saveAdminPass() {
+  const cur = document.getElementById('admin-cur-pass').value;
+  const nw  = document.getElementById('admin-new-pass').value;
+  if (cur !== ADMIN_PASS) { toast('Current password is incorrect','error'); return; }
+  if (!nw || nw.length < 8) { toast('New password must be at least 8 characters','error'); return; }
+  ADMIN_PASS = nw;
+  localStorage.setItem('ss_admin_pass', nw);
+  if (db) await upsertContent('admin_pass', nw, '');
+  document.getElementById('admin-cur-pass').value = '';
+  document.getElementById('admin-new-pass').value = '';
+  flashMsg('admin-pass-msg');
+  toast('Admin password updated');
+}
+
+/* ══════════════════════════════════════════
+   SETUP ACTIONS
+══════════════════════════════════════════ */
+function saveSBKey() {
+  const key = document.getElementById('sb-key-input').value.trim();
+  if (!key) { toast('Paste your anon key first','error'); return; }
+  SB_KEY = key;
+  localStorage.setItem('ss_admin_sb_key', key);
+  const ok = initDB();
+  const st = document.getElementById('sb-connect-status');
+  if (ok) {
+    st.textContent = '✓ Connected';
+    st.style.color = 'var(--green)';
+    document.getElementById('setup-banner').classList.add('hidden');
+    toast('Supabase connected! Refresh dashboard.');
+  } else {
+    st.textContent = '✗ Failed — check key';
+    st.style.color = 'var(--red)';
+  }
+}
+
+async function seedContent() {
+  if (!db) { toast('Connect Supabase first','error'); return; }
+  const rows = [
+    ...DEFAULT_STARS.flatMap(s => [
+      {key: s.key+'_name', value: s.name},
+      {key: s.key+'_desc', value: s.desc},
+    ]),
+    ...DEFAULT_STEPS.flatMap(s => [
+      {key: s.key+'_title', value: s.title},
+      {key: s.key+'_desc',  value: s.desc},
+    ]),
+    {key:'gate_email', value: GATE_EMAIL},
+    {key:'gate_pass',  value: GATE_PASS},
+  ];
+  await db.from('site_content').upsert(rows, {onConflict:'key'});
+  flashMsg('seed-msg');
+  toast('Default content seeded to Supabase');
+}
+
+function copySQL() {
+  navigator.clipboard.writeText(document.getElementById('setup-sql').textContent)
+    .then(() => toast('SQL copied to clipboard'));
+}
+function copyTracking() {
+  const code = `const SB_URL = 'https://ldhgxfsklorqzktuodmk.supabase.co';
+const SB_KEY = '${SB_KEY || 'YOUR_ANON_KEY'}';
+const _sb = supabase.createClient(SB_URL, SB_KEY);
+const _sid = Math.random().toString(36).slice(2);
+_sb.from('page_views').insert({referrer:document.referrer||null,user_agent:navigator.userAgent,session_id:_sid});`;
+  navigator.clipboard.writeText(code).then(() => toast('Tracking snippet copied'));
+}
+
+/* ══════════════════════════════════════════
+   HELPERS
+══════════════════════════════════════════ */
+async function upsertContent(key, value, old_value) {
+  if (!db) return;
+  await db.from('site_content').upsert({key, value, updated_at: new Date().toISOString()}, {onConflict:'key'});
+  if (old_value !== value) {
+    await db.from('content_edits').insert({content_key:key, old_value, new_value:value, admin_email: currentAdmin||ADMIN_EMAIL});
+  }
+}
+
+function fmtDate(iso) {
+  if (!iso) return '—';
+  const d = new Date(iso);
+  return d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) + ' ' +
+         d.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
+}
+
+function esc(str) {
+  return String(str||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function flashMsg(id) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 2500);
+}
+
+let toastTimer;
+function toast(msg, type='success') {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = 'show ' + type;
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.className = '', 3000);
+}
+</script>
+</body>
+</html>

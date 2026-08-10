@@ -6,6 +6,7 @@
 <title>Six Stars — The Human Operating System™</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,800;1,700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -458,6 +459,41 @@
   #signout-btn.visible { display: block; }
   #signout-btn:hover { color: var(--white); border-color: var(--white); }
 
+  /* ── INVITATION MODAL ── */
+  #invite-modal {
+    position: fixed; inset: 0; z-index: 500;
+    display: none; align-items: center; justify-content: center;
+    background: rgba(0,0,0,0.7); backdrop-filter: blur(6px);
+  }
+  #invite-modal.open { display: flex; }
+  .invite-card {
+    width: 100%; max-width: 460px;
+    background: rgba(12,13,22,0.98);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 40px 38px;
+    position: relative;
+    margin: 0 16px;
+  }
+  .invite-close {
+    position: absolute; top: 14px; right: 18px;
+    background: none; border: none; color: var(--muted);
+    font-size: 1.2rem; cursor: pointer; transition: color .2s;
+  }
+  .invite-close:hover { color: var(--white); }
+  .invite-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.5rem; font-weight: 800;
+    margin-bottom: 8px; letter-spacing: -0.02em;
+  }
+  .invite-title em { font-style: italic; color: var(--gold); }
+  .invite-sub { font-size: 0.8rem; color: var(--muted); line-height: 1.65; margin-bottom: 26px; }
+  textarea.field-input { min-height: 84px; resize: vertical; }
+  .invite-success { text-align: center; padding: 20px 0; display: none; }
+  .invite-success .big { font-size: 2rem; margin-bottom: 12px; }
+  .invite-success h3 { font-family: 'Playfair Display', serif; font-size: 1.3rem; margin-bottom: 8px; }
+  .invite-success p { font-size: 0.8rem; color: var(--muted); line-height: 1.6; }
+
   @media (max-width: 768px) {
     nav { padding: 0 24px; }
     .nav-links { display: none; }
@@ -529,7 +565,7 @@
     <h1>Excellence is not an event.<br>It is a <em>managed system.</em></h1>
     <p class="hero-body">A living system for human excellence — integrating behavioral science, measurable standards, artificial intelligence, and continuous coaching to develop exceptional people who show up that way in every area of their lives.</p>
     <div class="hero-btns">
-      <a class="btn-primary" href="#">Request an Invitation</a>
+      <a class="btn-primary" href="#" onclick="openInvite(event)">Request an Invitation</a>
       <a class="btn-outline" href="https://sixstars.ai/app" target="_blank">Enter the Platform →</a>
     </div>
     <p class="hero-footer">Now in Private Beta with the Founding Cohort · Six Stars™ · A StoryBit, Inc. Company</p>
@@ -612,7 +648,7 @@
       <h2>Ready to earn the<br><em>mark of excellence?</em></h2>
       <p>Join the founding cohort. People committed to operating at their highest level — in work, in leadership, in life — are already on the path.</p>
       <div class="hero-btns">
-        <a class="btn-primary" href="#">Request an Invitation</a>
+        <a class="btn-primary" href="#" onclick="openInvite(event)">Request an Invitation</a>
         <a class="btn-outline" href="https://sixstars.ai/app" target="_blank">Enter the Platform →</a>
       </div>
     </div>
@@ -623,6 +659,30 @@
     <p class="footer-text">A StoryBit, Inc. Company · Private Beta · All Rights Reserved</p>
   </footer>
 
+</div>
+
+<!-- ── INVITATION MODAL ── -->
+<div id="invite-modal" onclick="if(event.target===this)closeInvite()">
+  <div class="invite-card">
+    <button class="invite-close" onclick="closeInvite()">✕</button>
+    <div id="invite-form">
+      <div class="invite-title">Request an <em>Invitation.</em></div>
+      <p class="invite-sub">Six Stars is in private beta. Tell us who you are and why you're pursuing the standard — we review every request personally.</p>
+      <label class="field-label" for="inv-name">Full Name</label>
+      <input class="field-input" id="inv-name" type="text" placeholder="Your name">
+      <label class="field-label" for="inv-email">Email</label>
+      <input class="field-input" id="inv-email" type="email" placeholder="you@company.com">
+      <label class="field-label" for="inv-msg">Why Six Stars? <span style="text-transform:none;letter-spacing:0">(optional)</span></label>
+      <textarea class="field-input" id="inv-msg" placeholder="A sentence or two about what excellence means to you…"></textarea>
+      <button class="gate-btn" onclick="submitInvite()">Submit Request ✦</button>
+      <div class="gate-error" id="inv-error"></div>
+    </div>
+    <div class="invite-success" id="invite-success">
+      <div class="big">✦</div>
+      <h3>Request received.</h3>
+      <p>We review every request personally.<br>You'll hear from us soon.</p>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -658,6 +718,7 @@
     if (!email || !pass) { err.textContent = 'Please enter your email and password.'; return; }
     if (email === VALID_EMAIL.toLowerCase() && pass === VALID_PASS) {
       sessionStorage.setItem(SESSION_KEY, '1');
+      trackSignIn(email);
       openSite();
     } else {
       err.textContent = 'Incorrect email or password.';
@@ -682,6 +743,86 @@
   }
 
   if (sessionStorage.getItem(SESSION_KEY)) openSite();
+
+  /* ══ SUPABASE: TRACKING + LIVE CONTENT ══ */
+  var SB_URL = 'https://ldhgxfsklorqzktuodmk.supabase.co';
+  var SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxkaGd4ZnNrbG9ycXprdHVvZG1rIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ5MTg3NTYsImV4cCI6MjEwMDQ5NDc1Nn0.BTOboRCzCa2Mcv8V4kTZjuvNFYbejor1P3dQXXbKRLM';
+  var sb = null, sbSession = Math.random().toString(36).slice(2);
+  try { sb = supabase.createClient(SB_URL, SB_KEY); } catch(e) {}
+
+  // Page view (once per session)
+  if (sb && !sessionStorage.getItem('ss_pv')) {
+    sessionStorage.setItem('ss_pv', '1');
+    sb.from('page_views').insert({
+      referrer: document.referrer || null,
+      user_agent: navigator.userAgent,
+      session_id: sbSession
+    }).then(function(){});
+  }
+
+  function trackSignIn(email) {
+    if (sb) sb.from('sign_ins').insert({ email: email, session_id: sbSession }).then(function(){});
+  }
+
+  // Live content: pull edits made in the admin panel
+  if (sb) {
+    sb.from('site_content').select('key,value').then(function(res) {
+      if (!res.data) return;
+      var c = {};
+      res.data.forEach(function(r){ c[r.key] = r.value; });
+      // Gate credentials
+      if (c.gate_email) VALID_EMAIL = c.gate_email;
+      if (c.gate_pass)  VALID_PASS  = c.gate_pass;
+      // Six Stars cards
+      var cards = document.querySelectorAll('.star-card');
+      cards.forEach(function(card, i) {
+        var k = 'star_' + (i+1);
+        if (c[k+'_name']) card.querySelector('.star-name').textContent = c[k+'_name'];
+        if (c[k+'_desc']) card.querySelector('.star-desc').textContent = c[k+'_desc'];
+      });
+      // Pathway steps
+      var steps = document.querySelectorAll('.pathway-steps .step');
+      steps.forEach(function(step, i) {
+        var k = 'step_' + (i+1);
+        if (c[k+'_title']) step.querySelector('h4').textContent = c[k+'_title'];
+        if (c[k+'_desc'])  step.querySelector('p').textContent  = c[k+'_desc'];
+      });
+    });
+  }
+
+  /* ══ INVITATION MODAL ══ */
+  function openInvite(e) {
+    if (e) e.preventDefault();
+    document.getElementById('invite-modal').classList.add('open');
+    document.getElementById('invite-form').style.display = 'block';
+    document.getElementById('invite-success').style.display = 'none';
+  }
+  function closeInvite() {
+    document.getElementById('invite-modal').classList.remove('open');
+  }
+  function submitInvite() {
+    var name  = document.getElementById('inv-name').value.trim();
+    var email = document.getElementById('inv-email').value.trim();
+    var msg   = document.getElementById('inv-msg').value.trim();
+    var err   = document.getElementById('inv-error');
+    err.textContent = '';
+    if (!name || !email) { err.textContent = 'Name and email are required.'; return; }
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) { err.textContent = 'Please enter a valid email.'; return; }
+    function done() {
+      document.getElementById('invite-form').style.display = 'none';
+      document.getElementById('invite-success').style.display = 'block';
+      document.getElementById('inv-name').value = '';
+      document.getElementById('inv-email').value = '';
+      document.getElementById('inv-msg').value = '';
+    }
+    if (sb) {
+      sb.from('invitation_requests').insert({ name: name, email: email, message: msg || null })
+        .then(function(res) {
+          if (res.error) { err.textContent = 'Something went wrong — please try again.'; }
+          else done();
+        });
+    } else { done(); }
+  }
 </script>
 </body>
 </html>
