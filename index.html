@@ -1,911 +1,687 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Six Stars Certification</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    html { overflow-x: hidden; }
-    :root {
-      --ink:      #0d1117;
-      --ink-mid:  #1c2128;
-      --ink-soft: #2d3340;
-      --gold:     #c8860a;
-      --gold-lt:  #e5a020;
-      --gold-bg:  #faeeda;
-      --gold-dk:  #854f0b;
-      --white:    #ffffff;
-      --offwhite: #f8f6f2;
-      --border:   rgba(255,255,255,0.10);
-      --border-d: rgba(0,0,0,0.10);
-      --muted:    #8b949e;
-      --text:     #e6edf3;
-      --text-d:   #1c2128;
-      --font:     'Inter', sans-serif;
-    }
-    body { font-family: var(--font); background: var(--ink); color: var(--text); min-height: 100vh; }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Six Stars — The Human Operating System™</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,800;1,700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-    /* ── GATE ── */
-    #gate {
-      min-height: 100vh; display: flex; flex-direction: column;
-      align-items: center; justify-content: center; padding: 40px 24px;
-      background: var(--ink);
-    }
-    .gate-mark { display: flex; gap: 5px; margin-bottom: 28px; }
-    .gate-mark svg { width: 22px; height: 22px; color: var(--gold); }
-    .gate-title { font-size: 2rem; font-weight: 800; color: var(--white); letter-spacing: -0.03em; margin-bottom: 8px; text-align: center; }
-    .gate-sub { font-size: 0.85rem; color: var(--muted); margin-bottom: 36px; text-align: center; line-height: 1.6; max-width: 340px; }
-    .gate-box { width: 100%; max-width: 380px; }
-    .gate-label { font-size: 0.72rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 10px; }
-    .gate-input {
-      width: 100%; padding: 14px 18px; background: var(--ink-mid); border: 1px solid var(--border);
-      border-radius: 10px; font-size: 0.95rem; color: var(--white); font-family: var(--font);
-      outline: none; transition: border-color 0.15s; letter-spacing: 0.04em;
-    }
-    .gate-input:focus { border-color: var(--gold); }
-    .gate-input::placeholder { color: var(--muted); letter-spacing: 0; }
-    .gate-btn {
-      width: 100%; margin-top: 12px; padding: 14px; background: var(--gold); border: none;
-      border-radius: 10px; font-size: 0.9rem; font-weight: 700; color: var(--white);
-      cursor: pointer; font-family: var(--font); transition: background 0.15s; letter-spacing: 0.02em;
-    }
-    .gate-btn:hover { background: var(--gold-lt); }
-    .gate-error { font-size: 0.78rem; color: #f85149; margin-top: 10px; text-align: center; min-height: 18px; }
-    .gate-hint { font-size: 0.72rem; color: var(--muted); text-align: center; margin-top: 20px; line-height: 1.7; }
-    .gate-hint strong { color: rgba(255,255,255,0.5); }
+  :root {
+    --bg:       #07080f;
+    --gold:     #c8860a;
+    --gold-lt:  #d4a843;
+    --gold-dim: rgba(200,134,10,0.15);
+    --white:    #ffffff;
+    --muted:    rgba(255,255,255,0.45);
+    --card-bg:  rgba(255,255,255,0.04);
+    --border:   rgba(255,255,255,0.1);
+  }
 
-    /* ── SHARED CHROME ── */
-    .site-header {
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 16px 32px; border-bottom: 1px solid var(--border);
-      position: sticky; top: 0; z-index: 100; backdrop-filter: blur(12px);
-      background: rgba(13,17,23,0.92);
-    }
-    .site-logo { display: flex; align-items: center; gap: 8px; }
-    .site-logo .mark { display: flex; gap: 3px; }
-    .site-logo .mark svg { width: 14px; height: 14px; color: var(--gold); }
-    .site-logo .name { font-size: 0.88rem; font-weight: 700; color: var(--white); letter-spacing: -0.01em; }
-    .site-badge { font-size: 0.65rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; background: rgba(200,134,10,0.15); color: var(--gold); border: 1px solid rgba(200,134,10,0.3); border-radius: 20px; padding: 3px 10px; }
-    .header-right { display: flex; align-items: center; gap: 12px; }
-    .header-role { font-size: 0.72rem; color: var(--muted); }
-    .header-out { font-size: 0.75rem; color: var(--muted); cursor: pointer; padding: 6px 12px; border: 1px solid var(--border); border-radius: 6px; background: transparent; color: var(--muted); font-family: var(--font); transition: all 0.15s; }
-    .header-out:hover { color: var(--white); border-color: rgba(255,255,255,0.2); }
+  html, body {
+    height: 100%;
+    background: var(--bg);
+    color: var(--white);
+    font-family: 'Inter', sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
 
-    /* ── NAV TABS ── */
-    .nav-tabs { display: flex; gap: 2px; padding: 0 32px; border-bottom: 1px solid var(--border); overflow-x: auto; }
-    .nav-tab { padding: 14px 18px; font-size: 0.8rem; font-weight: 500; color: var(--muted); cursor: pointer; border-bottom: 2px solid transparent; white-space: nowrap; transition: all 0.15s; background: none; border-top: none; border-left: none; border-right: none; font-family: var(--font); }
-    .nav-tab:hover { color: var(--white); }
-    .nav-tab.active { color: var(--gold); border-bottom-color: var(--gold); }
+  #starfield {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    overflow: hidden;
+  }
+  .star {
+    position: absolute;
+    border-radius: 50%;
+    background: #fff;
+    animation: twinkle var(--d, 4s) ease-in-out infinite var(--delay, 0s);
+  }
+  @keyframes twinkle {
+    0%,100% { opacity: var(--lo, 0.15); }
+    50%      { opacity: var(--hi, 0.7);  }
+  }
 
-    /* ── CONTENT AREA ── */
-    .content { max-width: 960px; margin: 0 auto; padding: 40px 32px; }
-    .panel { display: none; }
-    .panel.active { display: block; }
+  #gate {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg);
+    transition: opacity 0.6s ease, visibility 0.6s;
+  }
+  #gate.hidden {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+  }
+  .gate-card {
+    width: 100%;
+    max-width: 440px;
+    background: rgba(12,13,22,0.95);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 48px 44px 44px;
+    position: relative;
+  }
+  .gate-stars {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    margin-bottom: 28px;
+  }
+  .gate-stars span {
+    font-size: 14px;
+    color: var(--gold);
+    animation: twinkle 3s ease-in-out infinite;
+  }
+  .gate-stars span:nth-child(2) { animation-delay: .4s; }
+  .gate-stars span:nth-child(3) { animation-delay: .8s; }
+  .gate-stars span:nth-child(4) { animation-delay: 1.2s; }
+  .gate-stars span:nth-child(5) { animation-delay: 1.6s; }
+  .gate-stars span:nth-child(6) { animation-delay: 2s; }
 
-    /* ── SECTION HEADINGS ── */
-    .sect-eyebrow { font-size: 0.67rem; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: var(--gold); margin-bottom: 10px; }
-    .sect-title { font-size: 1.5rem; font-weight: 800; color: var(--white); letter-spacing: -0.02em; margin-bottom: 10px; }
-    .sect-body { font-size: 0.88rem; color: var(--muted); line-height: 1.7; margin-bottom: 32px; max-width: 680px; }
+  .gate-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 2rem;
+    font-weight: 800;
+    text-align: center;
+    margin-bottom: 10px;
+    letter-spacing: -0.02em;
+  }
+  .gate-title em { font-style: italic; color: var(--gold); }
+  .gate-sub {
+    font-size: 0.83rem;
+    color: var(--muted);
+    text-align: center;
+    margin-bottom: 36px;
+    line-height: 1.65;
+  }
+  .field-label {
+    font-size: 0.68rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 8px;
+    display: block;
+  }
+  .field-input {
+    width: 100%;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 13px 16px;
+    color: var(--white);
+    font-size: 0.9rem;
+    font-family: 'Inter', sans-serif;
+    outline: none;
+    transition: border-color 0.2s;
+    margin-bottom: 20px;
+  }
+  .field-input::placeholder { color: rgba(255,255,255,0.22); }
+  .field-input:focus { border-color: var(--gold); }
 
-    /* ── CARDS ── */
-    .card { background: var(--ink-mid); border: 1px solid var(--border); border-radius: 14px; padding: 20px 22px; }
-    .card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px; margin-bottom: 32px; }
-    .card-grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 32px; }
+  .gate-btn {
+    width: 100%;
+    background: var(--gold);
+    color: #fff;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    border: none;
+    border-radius: 8px;
+    padding: 15px;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+    margin-top: 4px;
+  }
+  .gate-btn:hover  { background: var(--gold-lt); }
+  .gate-btn:active { transform: scale(0.98); }
 
-    /* ── STAR DIMENSION CARDS ── */
-    .dim-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(270px, 1fr)); gap: 12px; margin-bottom: 32px; }
-    .dim-card { background: var(--ink-mid); border: 1px solid var(--border); border-radius: 14px; padding: 18px 20px; }
-    .dim-top { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
-    .dim-num { width: 32px; height: 32px; border-radius: 50%; background: rgba(200,134,10,0.15); border: 1px solid rgba(200,134,10,0.3); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-    .dim-num svg { width: 15px; height: 15px; color: var(--gold); }
-    .dim-name { font-size: 0.9rem; font-weight: 700; color: var(--white); }
-    .dim-desc { font-size: 0.78rem; color: var(--muted); line-height: 1.6; margin-bottom: 10px; }
-    .dim-items { list-style: none; }
-    .dim-items li { font-size: 0.75rem; color: var(--muted); padding: 4px 0; display: flex; align-items: flex-start; gap: 8px; border-top: 1px solid rgba(255,255,255,0.05); }
-    .dim-items li:first-child { border-top: none; }
-    .dim-items li::before { content: '✓'; color: var(--gold); font-size: 0.7rem; margin-top: 1px; flex-shrink: 0; }
+  .gate-error {
+    font-size: 0.78rem;
+    color: #f85149;
+    text-align: center;
+    margin-top: 12px;
+    min-height: 18px;
+  }
+  .gate-footer {
+    font-size: 0.75rem;
+    color: var(--muted);
+    text-align: center;
+    margin-top: 24px;
+    line-height: 1.7;
+  }
 
-    /* ── MODULE CARDS ── */
-    .mod-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 32px; }
-    .mod-card { background: var(--ink-mid); border: 1px solid var(--border); border-radius: 12px; padding: 16px 20px; cursor: pointer; transition: border-color 0.15s; }
-    .mod-card:hover { border-color: rgba(200,134,10,0.4); }
-    .mod-card.open { border-color: var(--gold); }
-    .mod-top { display: flex; align-items: center; gap: 14px; }
-    .mod-star { font-size: 0.65rem; font-weight: 700; letter-spacing: 0.08em; background: rgba(200,134,10,0.15); color: var(--gold); border-radius: 20px; padding: 3px 10px; flex-shrink: 0; }
-    .mod-name { font-size: 0.9rem; font-weight: 600; color: var(--white); flex: 1; }
-    .mod-time { font-size: 0.72rem; color: var(--muted); }
-    .mod-body { margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--border); display: none; }
-    .mod-card.open .mod-body { display: block; }
-    .mod-tagline { font-size: 0.8rem; color: var(--gold); font-style: italic; margin-bottom: 10px; }
-    .mod-lessons { display: flex; flex-direction: column; gap: 6px; }
-    .mod-lesson { font-size: 0.78rem; color: var(--muted); padding: 6px 10px; background: rgba(255,255,255,0.03); border-radius: 6px; display: flex; gap: 10px; }
-    .mod-lesson-n { color: rgba(255,255,255,0.25); font-size: 0.7rem; flex-shrink: 0; margin-top: 1px; }
-    .mod-assess { margin-top: 12px; font-size: 0.75rem; color: var(--muted); background: rgba(200,134,10,0.07); border: 1px solid rgba(200,134,10,0.2); border-radius: 8px; padding: 10px 12px; line-height: 1.5; }
-    .mod-assess::before { content: 'Assessment: '; color: var(--gold); font-weight: 600; }
+  #site {
+    display: none;
+    min-height: 100vh;
+    position: relative;
+    z-index: 1;
+  }
+  #site.visible { display: block; }
 
-    /* ── METRIC CARDS ── */
-    .metric-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-bottom: 28px; }
-    .metric-card { background: var(--ink-mid); border: 1px solid var(--border); border-radius: 12px; padding: 16px 18px; }
-    .metric-label { font-size: 0.68rem; color: var(--muted); margin-bottom: 6px; letter-spacing: 0.04em; }
-    .metric-val { font-size: 1.6rem; font-weight: 800; color: var(--white); line-height: 1; }
-    .metric-sub { font-size: 0.68rem; color: var(--muted); margin-top: 4px; }
-    .metric-card.gold { border-color: rgba(200,134,10,0.3); background: rgba(200,134,10,0.07); }
-    .metric-card.gold .metric-val { color: var(--gold); }
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 48px;
+    height: 68px;
+    background: rgba(7,8,15,0.85);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+  .nav-brand {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.15rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    color: var(--white);
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .nav-brand span { color: var(--gold); font-size: 1.3rem; }
+  .nav-links { display: flex; gap: 36px; list-style: none; }
+  .nav-links a {
+    font-size: 0.72rem;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  .nav-links a:hover { color: var(--white); }
+  .nav-cta {
+    background: var(--gold);
+    color: #fff;
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 10px 22px;
+    border-radius: 6px;
+    text-decoration: none;
+    transition: background 0.2s;
+    cursor: pointer;
+    border: none;
+    font-family: 'Inter', sans-serif;
+  }
+  .nav-cta:hover { background: var(--gold-lt); }
 
-    /* ── FORMS ── */
-    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
-    .form-grid.one { grid-template-columns: 1fr; }
-    .form-group { display: flex; flex-direction: column; gap: 6px; }
-    .form-label { font-size: 0.72rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
-    .form-input, .form-select, .form-textarea {
-      padding: 11px 14px; background: var(--ink-soft); border: 1px solid var(--border);
-      border-radius: 8px; font-size: 0.85rem; color: var(--white); font-family: var(--font);
-      outline: none; transition: border-color 0.15s;
-    }
-    .form-input:focus, .form-select:focus, .form-textarea:focus { border-color: var(--gold); }
-    .form-input::placeholder, .form-textarea::placeholder { color: var(--muted); }
-    .form-select option { background: var(--ink-mid); }
-    .form-textarea { resize: vertical; min-height: 80px; }
-    .form-check { display: flex; align-items: center; gap: 10px; font-size: 0.82rem; color: var(--muted); cursor: pointer; }
-    .form-check input { width: 16px; height: 16px; accent-color: var(--gold); cursor: pointer; }
-    .btn { padding: 12px 24px; border-radius: 8px; font-size: 0.85rem; font-weight: 700; cursor: pointer; font-family: var(--font); border: none; transition: all 0.15s; }
-    .btn-gold { background: var(--gold); color: var(--white); }
-    .btn-gold:hover { background: var(--gold-lt); }
-    .btn-ghost { background: transparent; color: var(--muted); border: 1px solid var(--border); }
-    .btn-ghost:hover { color: var(--white); border-color: rgba(255,255,255,0.2); }
-    .btn-sm { padding: 6px 14px; font-size: 0.75rem; }
-    .btn-danger { background: transparent; color: #f85149; border: 1px solid rgba(248,81,73,0.3); }
-    .btn-danger:hover { background: rgba(248,81,73,0.1); }
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 120px 24px 80px;
+    position: relative;
+  }
+  .constellation {
+    margin-bottom: 48px;
+    animation: float 6s ease-in-out infinite;
+  }
+  @keyframes float {
+    0%,100% { transform: translateY(0); }
+    50%      { transform: translateY(-8px); }
+  }
+  .hero-eyebrow {
+    font-size: 0.68rem;
+    font-weight: 500;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 28px;
+  }
+  .hero-eyebrow span { color: var(--gold); margin: 0 6px; }
+  h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2.6rem, 6vw, 5rem);
+    font-weight: 800;
+    line-height: 1.08;
+    letter-spacing: -0.03em;
+    max-width: 820px;
+    margin-bottom: 28px;
+  }
+  h1 em { font-style: italic; color: var(--gold); }
+  .hero-body {
+    font-size: 1rem;
+    color: var(--muted);
+    max-width: 560px;
+    line-height: 1.75;
+    margin-bottom: 52px;
+  }
+  .hero-btns { display: flex; gap: 16px; flex-wrap: wrap; justify-content: center; }
+  .btn-primary {
+    background: var(--gold);
+    color: #fff;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 16px 32px;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background 0.2s, transform 0.1s;
+    display: inline-block;
+  }
+  .btn-primary:hover  { background: var(--gold-lt); }
+  .btn-primary:active { transform: scale(0.97); }
+  .btn-outline {
+    background: transparent;
+    color: var(--white);
+    font-family: 'Inter', sans-serif;
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 15px 32px;
+    border-radius: 6px;
+    border: 1px solid rgba(255,255,255,0.25);
+    cursor: pointer;
+    text-decoration: none;
+    transition: border-color 0.2s, color 0.2s;
+    display: inline-block;
+  }
+  .btn-outline:hover { border-color: var(--white); }
+  .hero-footer {
+    position: absolute;
+    bottom: 28px;
+    font-size: 0.62rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.2);
+  }
 
-    /* ── TABLES ── */
-    .tbl-wrap { overflow-x: auto; margin-bottom: 24px; }
-    table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
-    th { text-align: left; font-size: 0.67rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); padding: 10px 14px; border-bottom: 1px solid var(--border); }
-    td { padding: 12px 14px; border-bottom: 1px solid rgba(255,255,255,0.04); color: var(--muted); vertical-align: middle; }
-    tr:hover td { background: rgba(255,255,255,0.02); }
-    .td-name { color: var(--white); font-weight: 500; }
+  .gold-line {
+    width: 48px;
+    height: 1px;
+    background: var(--gold);
+    margin: 0 auto 64px;
+    opacity: 0.5;
+  }
 
-    /* ── STATUS PILLS ── */
-    .pill { font-size: 0.65rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; padding: 3px 10px; border-radius: 20px; white-space: nowrap; }
-    .pill-pending { background: rgba(200,134,10,0.15); color: var(--gold); }
-    .pill-approved { background: rgba(57,197,128,0.12); color: #39c580; }
-    .pill-denied { background: rgba(248,81,73,0.12); color: #f85149; }
-    .pill-info { background: rgba(88,166,255,0.12); color: #58a6ff; }
-    .pill-certified { background: rgba(200,134,10,0.2); color: var(--gold); border: 1px solid rgba(200,134,10,0.3); }
-    .pill-suspended { background: rgba(248,81,73,0.1); color: #f85149; }
+  .section { padding: 100px 48px; max-width: 1100px; margin: 0 auto; }
+  .section-label {
+    font-size: 0.65rem;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 18px;
+  }
+  .section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.8rem, 3.5vw, 2.8rem);
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    line-height: 1.15;
+    margin-bottom: 20px;
+  }
+  .section-body {
+    font-size: 0.95rem;
+    color: var(--muted);
+    max-width: 560px;
+    line-height: 1.8;
+    margin-bottom: 56px;
+  }
 
-    /* ── STAR BAR ── */
-    .star-bars { display: flex; flex-direction: column; gap: 5px; }
-    .star-row { display: flex; align-items: center; gap: 8px; }
-    .star-dim { font-size: 0.68rem; color: var(--muted); min-width: 90px; }
-    .star-track { flex: 1; height: 4px; background: rgba(255,255,255,0.07); border-radius: 2px; }
-    .star-fill { height: 100%; border-radius: 2px; background: var(--gold); }
-    .star-score { font-size: 0.68rem; color: var(--muted); min-width: 26px; text-align: right; }
+  .stars-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+  .star-card { background: var(--bg); padding: 36px 32px; transition: background 0.2s; }
+  .star-card:hover { background: var(--card-bg); }
+  .star-num {
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+  .star-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.15rem;
+    font-weight: 700;
+    margin-bottom: 10px;
+  }
+  .star-desc { font-size: 0.82rem; color: var(--muted); line-height: 1.7; }
 
-    /* ── REVENUE BARS ── */
-    .rev-row { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
-    .rev-label { font-size: 0.75rem; color: var(--muted); min-width: 140px; }
-    .rev-track { flex: 1; height: 6px; background: rgba(255,255,255,0.06); border-radius: 3px; }
-    .rev-bar { height: 100%; border-radius: 3px; background: var(--gold); transition: width 0.5s; }
-    .rev-val { font-size: 0.75rem; font-weight: 600; color: var(--white); min-width: 80px; text-align: right; }
+  .pathway-section {
+    padding: 100px 48px;
+    background: var(--card-bg);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+  .pathway-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 80px;
+    align-items: center;
+  }
+  .pathway-steps { list-style: none; display: flex; flex-direction: column; gap: 0; }
+  .step { display: flex; gap: 20px; padding: 24px 0; border-bottom: 1px solid var(--border); }
+  .step:last-child { border-bottom: none; }
+  .step-num {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    border: 1px solid var(--gold);
+    color: var(--gold);
+    font-size: 0.72rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+  .step-text h4 { font-size: 0.9rem; font-weight: 600; margin-bottom: 5px; }
+  .step-text p { font-size: 0.8rem; color: var(--muted); line-height: 1.65; }
 
-    /* ── COHORT CARDS ── */
-    .cohort-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; margin-bottom: 28px; }
-    .cohort-card { background: var(--ink-mid); border: 1px solid var(--border); border-radius: 12px; padding: 18px 20px; }
-    .cohort-name { font-size: 0.9rem; font-weight: 700; color: var(--white); margin-bottom: 4px; }
-    .cohort-dates { font-size: 0.72rem; color: var(--muted); margin-bottom: 12px; }
-    .cohort-progress { margin-bottom: 12px; }
-    .cohort-prog-label { font-size: 0.68rem; color: var(--muted); margin-bottom: 5px; }
-    .cohort-track { height: 4px; background: rgba(255,255,255,0.07); border-radius: 2px; }
-    .cohort-fill { height: 100%; border-radius: 2px; background: var(--gold); }
-    .cohort-members { display: flex; flex-wrap: wrap; gap: 6px; }
-    .cohort-member { font-size: 0.68rem; color: var(--muted); background: rgba(255,255,255,0.05); border-radius: 20px; padding: 3px 9px; }
+  .cta-section { padding: 120px 48px; text-align: center; }
+  .cta-inner { max-width: 640px; margin: 0 auto; }
+  .cta-inner h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2rem, 4vw, 3.2rem);
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+    margin-bottom: 20px;
+  }
+  .cta-inner h2 em { font-style: italic; color: var(--gold); }
+  .cta-inner p { font-size: 0.92rem; color: var(--muted); line-height: 1.8; margin-bottom: 44px; }
 
-    /* ── CURRICULUM CARDS ── */
-    .curr-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 28px; }
-    .curr-card { background: var(--ink-mid); border: 1px solid var(--border); border-radius: 12px; padding: 16px 20px; display: flex; align-items: center; gap: 16px; }
-    .curr-num { width: 36px; height: 36px; border-radius: 50%; background: rgba(200,134,10,0.12); border: 1px solid rgba(200,134,10,0.25); display: flex; align-items: center; justify-content: center; font-size: 0.78rem; font-weight: 800; color: var(--gold); flex-shrink: 0; }
-    .curr-info { flex: 1; }
-    .curr-name { font-size: 0.88rem; font-weight: 600; color: var(--white); margin-bottom: 2px; }
-    .curr-meta { font-size: 0.72rem; color: var(--muted); }
-    .curr-actions { display: flex; gap: 8px; align-items: center; }
-    .toggle-switch { position: relative; width: 40px; height: 22px; flex-shrink: 0; }
-    .toggle-switch input { opacity: 0; width: 0; height: 0; }
-    .toggle-slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background: rgba(255,255,255,0.1); border-radius: 22px; transition: 0.2s; }
-    .toggle-slider:before { position: absolute; content: ''; height: 16px; width: 16px; left: 3px; bottom: 3px; background: var(--white); border-radius: 50%; transition: 0.2s; }
-    .toggle-switch input:checked + .toggle-slider { background: var(--gold); }
-    .toggle-switch input:checked + .toggle-slider:before { transform: translateX(18px); }
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 40px 48px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .footer-brand {
+    font-family: 'Playfair Display', serif;
+    font-size: 1rem;
+    font-weight: 700;
+    color: rgba(255,255,255,0.5);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .footer-brand span { color: var(--gold); }
+  .footer-text { font-size: 0.68rem; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(255,255,255,0.2); }
 
-    /* ── DIVIDER ── */
-    .divider { border: none; border-top: 1px solid var(--border); margin: 28px 0; }
+  #signout-btn {
+    position: fixed;
+    top: 16px; right: 160px;
+    z-index: 200;
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    font-family: 'Inter', sans-serif;
+    font-size: 0.68rem;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 8px 16px;
+    border-radius: 5px;
+    cursor: pointer;
+    display: none;
+    transition: color 0.2s, border-color 0.2s;
+  }
+  #signout-btn.visible { display: block; }
+  #signout-btn:hover { color: var(--white); border-color: var(--white); }
 
-    /* ── ACTION ROW ── */
-    .action-row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-bottom: 20px; }
-
-    /* ── INVESTOR SPECIFIC ── */
-    .inv-hero { text-align: center; padding: 48px 24px 40px; border-bottom: 1px solid var(--border); margin-bottom: 40px; }
-    .inv-hero h1 { font-size: 2.4rem; font-weight: 800; color: var(--white); letter-spacing: -0.03em; margin-bottom: 14px; line-height: 1.15; }
-    .inv-hero p { font-size: 1rem; color: var(--muted); max-width: 560px; margin: 0 auto; line-height: 1.7; }
-    .opp-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; margin-bottom: 32px; }
-    .opp-card { background: var(--ink-mid); border: 1px solid var(--border); border-radius: 14px; padding: 20px; text-align: center; }
-    .opp-num { font-size: 2rem; font-weight: 800; color: var(--gold); letter-spacing: -0.03em; }
-    .opp-label { font-size: 0.75rem; color: var(--muted); margin-top: 4px; line-height: 1.5; }
-
-    /* ── TOAST ── */
-    .toast { position: fixed; bottom: 28px; right: 28px; background: var(--ink-soft); border: 1px solid var(--border); border-radius: 10px; padding: 12px 18px; font-size: 0.82rem; color: var(--white); z-index: 9999; display: none; }
-    .toast.show { display: block; }
-    .toast.success { border-color: rgba(57,197,128,0.4); }
-
-    @media (max-width: 600px) {
-      .site-header { padding: 14px 20px; }
-      .nav-tabs { padding: 0 20px; }
-      .content { padding: 28px 20px; }
-      .form-grid { grid-template-columns: 1fr; }
-    }
-  </style>
+  @media (max-width: 768px) {
+    nav { padding: 0 24px; }
+    .nav-links { display: none; }
+    .section, .cta-section { padding: 72px 24px; }
+    .stars-grid { grid-template-columns: 1fr; }
+    .pathway-inner { grid-template-columns: 1fr; gap: 48px; }
+    .gate-card { padding: 36px 28px; margin: 0 16px; }
+    footer { flex-direction: column; gap: 16px; text-align: center; }
+    #signout-btn { right: 90px; }
+  }
+</style>
 </head>
 <body>
 
-<!-- ══════════════════════════════════════════ GATE ══════════════════════════════════════════ -->
+<div id="starfield"></div>
+<button id="signout-btn" onclick="signOut()">Sign Out</button>
+
 <div id="gate">
-  <div class="gate-mark">
-    <svg viewBox="0 0 20 20" fill="currentColor"><path d="M10 1l1.8 5.6H17l-4.7 3.4 1.8 5.6L10 12.2l-4.1 3.4 1.8-5.6L3 6.6h5.2z"/></svg>
-    <svg viewBox="0 0 20 20" fill="currentColor"><path d="M10 1l1.8 5.6H17l-4.7 3.4 1.8 5.6L10 12.2l-4.1 3.4 1.8-5.6L3 6.6h5.2z"/></svg>
-    <svg viewBox="0 0 20 20" fill="currentColor"><path d="M10 1l1.8 5.6H17l-4.7 3.4 1.8 5.6L10 12.2l-4.1 3.4 1.8-5.6L3 6.6h5.2z"/></svg>
-    <svg viewBox="0 0 20 20" fill="currentColor"><path d="M10 1l1.8 5.6H17l-4.7 3.4 1.8 5.6L10 12.2l-4.1 3.4 1.8-5.6L3 6.6h5.2z"/></svg>
-    <svg viewBox="0 0 20 20" fill="currentColor"><path d="M10 1l1.8 5.6H17l-4.7 3.4 1.8 5.6L10 12.2l-4.1 3.4 1.8-5.6L3 6.6h5.2z"/></svg>
-    <svg viewBox="0 0 20 20" fill="currentColor"><path d="M10 1l1.8 5.6H17l-4.7 3.4 1.8 5.6L10 12.2l-4.1 3.4 1.8-5.6L3 6.6h5.2z"/></svg>
-  </div>
-  <div class="gate-title">Six Stars Certification</div>
-  <div class="gate-sub">The quality mark earned by the finest craftspeople in the trades. Not bought. Earned.</div>
-  <div class="gate-box">
-    <div class="gate-label">Access Code</div>
-    <input class="gate-input" id="gateInput" type="password" placeholder="Enter your access code" autocomplete="off" onkeydown="if(event.key==='Enter')gateSubmit()">
-    <button class="gate-btn" onclick="gateSubmit()">Enter</button>
-    <div class="gate-error" id="gateError"></div>
-    <div class="gate-hint">
-      Professionals: <strong>SIXSTARS-[your phone number]</strong><br>
-      Partners &amp; Investors: contact <strong>hello@sixstars.ai</strong>
+  <div class="gate-card">
+    <div class="gate-stars">
+      <span>✦</span><span>✦</span><span>✦</span><span>✦</span><span>✦</span><span>✦</span>
     </div>
+    <div class="gate-title">Welcome to <em>Six Stars.</em></div>
+    <p class="gate-sub">The human operating system for people who pursue excellence — not as an event, but as a way of life.</p>
+    <label class="field-label" for="gate-email">Email</label>
+    <input class="field-input" id="gate-email" type="email" placeholder="you@company.com" autocomplete="email" onkeydown="if(event.key==='Enter')gateSubmit()">
+    <label class="field-label" for="gate-pass">Password</label>
+    <input class="field-input" id="gate-pass" type="password" placeholder="Your password" autocomplete="current-password" onkeydown="if(event.key==='Enter')gateSubmit()" style="margin-bottom:8px">
+    <button class="gate-btn" onclick="gateSubmit()">Sign In ✦</button>
+    <div class="gate-error" id="gate-error"></div>
+    <p class="gate-footer">Private beta · By invitation only<br><strong style="color:rgba(255,255,255,0.35)">Six Stars™ · A StoryBit, Inc. Company</strong></p>
   </div>
 </div>
 
-<!-- ══════════════════════════════════════════ SHELL ══════════════════════════════════════════ -->
-<div id="shell" style="display:none">
-  <header class="site-header">
-    <div class="site-logo">
-      <div class="mark">
-        <svg viewBox="0 0 20 20" fill="currentColor"><path d="M10 1l1.8 5.6H17l-4.7 3.4 1.8 5.6L10 12.2l-4.1 3.4 1.8-5.6L3 6.6h5.2z"/></svg>
-        <svg viewBox="0 0 20 20" fill="currentColor"><path d="M10 1l1.8 5.6H17l-4.7 3.4 1.8 5.6L10 12.2l-4.1 3.4 1.8-5.6L3 6.6h5.2z"/></svg>
-        <svg viewBox="0 0 20 20" fill="currentColor"><path d="M10 1l1.8 5.6H17l-4.7 3.4 1.8 5.6L10 12.2l-4.1 3.4 1.8-5.6L3 6.6h5.2z"/></svg>
-        <svg viewBox="0 0 20 20" fill="currentColor"><path d="M10 1l1.8 5.6H17l-4.7 3.4 1.8 5.6L10 12.2l-4.1 3.4 1.8-5.6L3 6.6h5.2z"/></svg>
-        <svg viewBox="0 0 20 20" fill="currentColor"><path d="M10 1l1.8 5.6H17l-4.7 3.4 1.8 5.6L10 12.2l-4.1 3.4 1.8-5.6L3 6.6h5.2z"/></svg>
-        <svg viewBox="0 0 20 20" fill="currentColor"><path d="M10 1l1.8 5.6H17l-4.7 3.4 1.8 5.6L10 12.2l-4.1 3.4 1.8-5.6L3 6.6h5.2z"/></svg>
+<div id="site">
+
+  <nav>
+    <a class="nav-brand" href="#"><span>✦</span> Six Stars</a>
+    <ul class="nav-links">
+      <li><a href="#vision">Vision</a></li>
+      <li><a href="#stars">The Six Stars</a></li>
+      <li><a href="#system">The System</a></li>
+      <li><a href="#pathway">Pathway</a></li>
+    </ul>
+    <a class="nav-cta" href="https://sixstars.ai/app" target="_blank">Enter the Platform</a>
+  </nav>
+
+  <section class="hero">
+    <svg class="constellation" width="130" height="100" viewBox="0 0 130 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <line x1="65" y1="12" x2="30" y2="55" stroke="rgba(200,134,10,0.4)" stroke-width="1"/>
+      <line x1="65" y1="12" x2="100" y2="45" stroke="rgba(200,134,10,0.4)" stroke-width="1"/>
+      <line x1="30" y1="55" x2="100" y2="45" stroke="rgba(200,134,10,0.4)" stroke-width="1"/>
+      <line x1="30" y1="55" x2="50" y2="85" stroke="rgba(200,134,10,0.4)" stroke-width="1"/>
+      <line x1="100" y1="45" x2="80" y2="80" stroke="rgba(200,134,10,0.4)" stroke-width="1"/>
+      <line x1="50" y1="85" x2="80" y2="80" stroke="rgba(200,134,10,0.4)" stroke-width="1"/>
+      <circle cx="65" cy="12"  r="3" fill="#c8860a"/>
+      <circle cx="30" cy="55"  r="3" fill="#c8860a"/>
+      <circle cx="100" cy="45" r="3" fill="#c8860a"/>
+      <circle cx="50" cy="85"  r="3" fill="#c8860a"/>
+      <circle cx="80" cy="80"  r="3" fill="#c8860a"/>
+      <circle cx="65" cy="12"  r="6" fill="rgba(200,134,10,0.15)"/>
+      <circle cx="30" cy="55"  r="6" fill="rgba(200,134,10,0.15)"/>
+      <circle cx="100" cy="45" r="6" fill="rgba(200,134,10,0.15)"/>
+      <circle cx="50" cy="85"  r="6" fill="rgba(200,134,10,0.15)"/>
+      <circle cx="80" cy="80"  r="6" fill="rgba(200,134,10,0.15)"/>
+    </svg>
+
+    <p class="hero-eyebrow">Six Stars — The Human Operating System™<span>·</span>Private Beta</p>
+    <h1>Excellence is not an event.<br>It is a <em>managed system.</em></h1>
+    <p class="hero-body">A living system for human excellence — integrating behavioral science, measurable standards, artificial intelligence, and continuous coaching to develop exceptional people who show up that way in every area of their lives.</p>
+    <div class="hero-btns">
+      <a class="btn-primary" href="#">Request an Invitation</a>
+      <a class="btn-outline" href="https://sixstars.ai/app" target="_blank">Enter the Platform →</a>
+    </div>
+    <p class="hero-footer">Now in Private Beta with the Founding Cohort · Six Stars™ · A StoryBit, Inc. Company</p>
+  </section>
+
+  <section class="section" id="stars">
+    <p class="section-label">The Framework</p>
+    <h2 class="section-title">Six dimensions.<br>One standard.</h2>
+    <p class="section-body">Every person in the system is measured across six behavioral dimensions — not once, but continuously — so excellence isn't assumed. It's built, tracked, and verified.</p>
+    <div class="stars-grid">
+      <div class="star-card">
+        <div class="star-num">Star 1</div>
+        <div class="star-name">Craft</div>
+        <p class="star-desc">The quality of the work itself. Skills, output, and domain knowledge — assessed and on record.</p>
       </div>
-      <span class="name">Six Stars</span>
+      <div class="star-card">
+        <div class="star-num">Star 2</div>
+        <div class="star-name">Integrity</div>
+        <p class="star-desc">Values in action, not just on paper. Ethics scenario assessments — three situations, all three must pass.</p>
+      </div>
+      <div class="star-card">
+        <div class="star-num">Star 3</div>
+        <div class="star-name">Communication</div>
+        <p class="star-desc">How you listen, respond, and show up for others — assessed through real scenarios and ongoing interaction data.</p>
+      </div>
+      <div class="star-card">
+        <div class="star-num">Star 4</div>
+        <div class="star-name">Reliability</div>
+        <p class="star-desc">Follow-through, consistency, and dependability — tracked across real commitments and engagements.</p>
+      </div>
+      <div class="star-card">
+        <div class="star-num">Star 5</div>
+        <div class="star-name">Experience</div>
+        <p class="star-desc">The impact you leave on others — measured through structured feedback from the people you work with and serve.</p>
+      </div>
+      <div class="star-card">
+        <div class="star-num">Star 6</div>
+        <div class="star-name">Legacy</div>
+        <p class="star-desc">How you invest in others, give back, and grow beyond yourself — the long-term mark of a person who truly operates at six stars.</p>
+      </div>
     </div>
-    <div class="header-right">
-      <span class="site-badge" id="headerBadge">Certification Portal</span>
-      <span class="header-role" id="headerRole"></span>
-      <button class="header-out" onclick="signOut()">Sign out</button>
-    </div>
-  </header>
-  <div class="nav-tabs" id="navTabs"></div>
-  <div class="content" id="mainContent"></div>
-</div>
+  </section>
 
-<div class="toast" id="toast"></div>
+  <div class="pathway-section" id="pathway">
+    <div class="pathway-inner">
+      <div>
+        <p class="section-label">The Pathway</p>
+        <h2 class="section-title">Earned,<br>not bought.</h2>
+        <p class="section-body">Six Stars follows a rigorous, structured process. No shortcuts. No grandfathering. Every person goes through the same journey.</p>
+        <a class="btn-outline" href="#">Learn More →</a>
+      </div>
+      <ol class="pathway-steps">
+        <li class="step">
+          <div class="step-num">1</div>
+          <div class="step-text"><h4>Apply</h4><p>Submit your application with identity verification and a commitment to the standard.</p></div>
+        </li>
+        <li class="step">
+          <div class="step-num">2</div>
+          <div class="step-text"><h4>Complete 6 Training Modules</h4><p>Master the behavioral standards across all six dimensions.</p></div>
+        </li>
+        <li class="step">
+          <div class="step-num">3</div>
+          <div class="step-text"><h4>Join Your Cohort</h4><p>Train alongside peers and complete real-world scenario assessments.</p></div>
+        </li>
+        <li class="step">
+          <div class="step-num">4</div>
+          <div class="step-text"><h4>Pass All Assessments</h4><p>Every dimension is assessed. All six must be passed to earn the badge.</p></div>
+        </li>
+        <li class="step">
+          <div class="step-num">5</div>
+          <div class="step-text"><h4>Badge Awarded</h4><p>Your profile goes live and your Six Stars standing begins — maintained through continuous performance.</p></div>
+        </li>
+      </ol>
+    </div>
+  </div>
+
+  <section class="cta-section">
+    <div class="cta-inner">
+      <div class="gold-line"></div>
+      <h2>Ready to earn the<br><em>mark of excellence?</em></h2>
+      <p>Join the founding cohort. People committed to operating at their highest level — in work, in leadership, in life — are already on the path.</p>
+      <div class="hero-btns">
+        <a class="btn-primary" href="#">Request an Invitation</a>
+        <a class="btn-outline" href="https://sixstars.ai/app" target="_blank">Enter the Platform →</a>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="footer-brand"><span>✦</span> Six Stars™</div>
+    <p class="footer-text">A StoryBit, Inc. Company · Private Beta · All Rights Reserved</p>
+  </footer>
+
+</div>
 
 <script>
-// ── STORAGE KEYS ──
-var SS_APPS  = 'ss_applications';
-var SS_PROS  = 'ss_professionals';
-var SS_COH   = 'ss_cohorts';
-var SS_REV   = 'ss_revenue';
-var SS_CURR  = 'ss_curriculum';
-var SS_ROLE  = 'ss_role';
+  (function() {
+    var sf = document.getElementById('starfield');
+    for (var i = 0; i < 90; i++) {
+      var s = document.createElement('div');
+      s.className = 'star';
+      var size = Math.random() * 1.8 + 0.5;
+      s.style.cssText = [
+        'width:' + size + 'px',
+        'height:' + size + 'px',
+        'left:' + Math.random() * 100 + '%',
+        'top:' + Math.random() * 100 + '%',
+        '--d:' + (Math.random() * 5 + 2) + 's',
+        '--delay:-' + Math.random() * 5 + 's',
+        '--lo:' + (Math.random() * 0.1 + 0.05),
+        '--hi:' + (Math.random() * 0.5 + 0.3),
+      ].join(';');
+      sf.appendChild(s);
+    }
+  })();
 
-// ── SEED DATA ──
-function seedData() {
-  if (!localStorage.getItem(SS_APPS)) {
-    localStorage.setItem(SS_APPS, JSON.stringify([
-      { id:'a1', name:'Marcus Reyes', phone:'6195550142', specialty:'Master Carpenter', license:'C-6194821', years:14, portfolio:'marcusreyes.com', insured:true, status:'approved', applied:'2026-06-01', notes:'' },
-      { id:'a2', name:'Sandra Kim', phone:'6195550287', specialty:'Interior Finishes / Tile', license:'C-7821034', years:9, portfolio:'', insured:true, status:'approved', applied:'2026-06-05', notes:'' },
-      { id:'a3', name:'Derek Torres', phone:'6195550399', specialty:'General Contractor', license:'B-1138945', years:6, portfolio:'', insured:true, status:'pending', applied:'2026-06-18', notes:'' },
-      { id:'a4', name:'Priya Nair', phone:'6195550511', specialty:'Plumbing', license:'C-36-91234', years:11, portfolio:'priyaplumbing.com', insured:true, status:'info', applied:'2026-06-20', notes:'Need updated insurance cert' },
-      { id:'a5', name:'James Whitfield', phone:'6195550633', specialty:'HVAC', license:'C-20-88812', years:18, portfolio:'', insured:false, status:'pending', applied:'2026-06-25', notes:'' }
-    ]));
+  var VALID_EMAIL = 'mikelwalton@outlook.com';
+  var VALID_PASS  = 'Mikel2Day!';
+  var SESSION_KEY = 'ss_auth';
+
+  function gateSubmit() {
+    var email = document.getElementById('gate-email').value.trim().toLowerCase();
+    var pass  = document.getElementById('gate-pass').value;
+    var err   = document.getElementById('gate-error');
+    err.textContent = '';
+    if (!email || !pass) { err.textContent = 'Please enter your email and password.'; return; }
+    if (email === VALID_EMAIL.toLowerCase() && pass === VALID_PASS) {
+      sessionStorage.setItem(SESSION_KEY, '1');
+      openSite();
+    } else {
+      err.textContent = 'Incorrect email or password.';
+      document.getElementById('gate-pass').value = '';
+    }
   }
-  if (!localStorage.getItem(SS_PROS)) {
-    localStorage.setItem(SS_PROS, JSON.stringify([
-      { id:'p1', name:'Marcus Reyes', specialty:'Master Carpenter', phone:'6195550142', certified:'2026-03-15', renewal:'2027-03-15', status:'certified', stars:{ craft:96, integrity:100, communication:91, reliability:98, experience:88, legacy:94 } },
-      { id:'p2', name:'Sandra Kim', specialty:'Interior Finishes', phone:'6195550287', certified:'2026-04-01', renewal:'2027-04-01', status:'certified', stars:{ craft:92, integrity:98, communication:95, reliability:100, experience:90, legacy:82 } }
-    ]));
+
+  function openSite() {
+    document.getElementById('gate').classList.add('hidden');
+    document.getElementById('site').classList.add('visible');
+    document.getElementById('signout-btn').classList.add('visible');
   }
-  if (!localStorage.getItem(SS_COH)) {
-    localStorage.setItem(SS_COH, JSON.stringify([
-      { id:'c1', name:'Cohort 01 — Spring 2026', start:'2026-04-07', grad:'2026-06-28', members:['Marcus Reyes','Sandra Kim'], progress:100, status:'graduated' },
-      { id:'c2', name:'Cohort 02 — Summer 2026', start:'2026-07-07', grad:'2026-09-20', members:['Derek Torres','Priya Nair'], progress:20, status:'active' }
-    ]));
+
+  function signOut() {
+    sessionStorage.removeItem(SESSION_KEY);
+    document.getElementById('gate').classList.remove('hidden');
+    document.getElementById('gate-email').value = '';
+    document.getElementById('gate-pass').value = '';
+    document.getElementById('gate-error').textContent = '';
+    document.getElementById('site').classList.remove('visible');
+    document.getElementById('signout-btn').classList.remove('visible');
   }
-  if (!localStorage.getItem(SS_CURR)) {
-    localStorage.setItem(SS_CURR, JSON.stringify([
-      { id:'m1', num:1, name:'Craft', tagline:'We are not teaching you your trade. We are teaching you to present it.', time:'2 hrs', format:'Self-paced', published:true, updated:'2026-05-10' },
-      { id:'m2', num:2, name:'Integrity', tagline:'A license is compliance. Integrity is a choice made every day.', time:'1.5 hrs', format:'Self-paced', published:true, updated:'2026-05-10' },
-      { id:'m3', num:3, name:'Communication', tagline:'The client is not anxious about your work. They are anxious about the unknown. You hold the map.', time:'2.5 hrs', format:'Cohort + video', published:true, updated:'2026-06-01' },
-      { id:'m4', num:4, name:'Reliability', tagline:'The professional who shows up is already ahead of most of the competition.', time:'2 hrs', format:'Cohort + self-paced', published:true, updated:'2026-06-01' },
-      { id:'m5', num:5, name:'Experience', tagline:'Anyone can do the work. Very few make the client feel like they were cared for.', time:'3 hrs', format:'Cohort intensive', published:true, updated:'2026-06-15' },
-      { id:'m6', num:6, name:'Legacy', tagline:'A craftsperson builds. A master leaves something that speaks after they have gone.', time:'2 hrs', format:'Self-directed', published:false, updated:'2026-06-20' }
-    ]));
-  }
-}
 
-// ── AUTH ──
-var ADMIN_PASS = 'Mikel2Day!';
-var INVESTOR_PASS = 'SIXSTARS';
-
-function gateSubmit() {
-  var val = document.getElementById('gateInput').value.trim();
-  var err = document.getElementById('gateError');
-  err.textContent = '';
-  if (!val) { err.textContent = 'Enter your access code.'; return; }
-  if (val === ADMIN_PASS) {
-    sessionStorage.setItem(SS_ROLE, 'admin');
-    launch('admin');
-  } else if (val === INVESTOR_PASS) {
-    sessionStorage.setItem(SS_ROLE, 'investor');
-    launch('investor');
-  } else if (/^SIXSTARS-\d{10}$/.test(val)) {
-    sessionStorage.setItem(SS_ROLE, 'pro');
-    sessionStorage.setItem('ss_phone', val.replace('SIXSTARS-',''));
-    launch('pro');
-  } else {
-    err.textContent = 'Access code not recognised. Check your code and try again.';
-  }
-}
-
-function launch(role) {
-  seedData();
-  document.getElementById('gate').style.display = 'none';
-  document.getElementById('shell').style.display = 'block';
-  if (role === 'admin') {
-    document.getElementById('headerBadge').textContent = 'Admin Console';
-    document.getElementById('headerRole').textContent = 'Administrator';
-    buildAdminNav();
-    showAdminPanel('dashboard');
-  } else if (role === 'investor') {
-    document.getElementById('headerBadge').textContent = 'Partner Portal';
-    document.getElementById('headerRole').textContent = 'Investor / Partner';
-    buildInvestorNav();
-    showInvestorPanel('overview');
-  } else {
-    document.getElementById('headerBadge').textContent = 'Certification Portal';
-    document.getElementById('headerRole').textContent = 'Professional Applicant';
-    buildProNav();
-    showProPanel('about');
-  }
-}
-
-function signOut() {
-  sessionStorage.clear();
-  document.getElementById('shell').style.display = 'none';
-  document.getElementById('gate').style.display = 'flex';
-  document.getElementById('gateInput').value = '';
-}
-
-function checkSession() {
-  var role = sessionStorage.getItem(SS_ROLE);
-  if (role) { seedData(); launch(role); }
-}
-
-// ── TOAST ──
-function toast(msg, type) {
-  var t = document.getElementById('toast');
-  t.textContent = msg;
-  t.className = 'toast show' + (type ? ' ' + type : '');
-  setTimeout(function(){ t.className = 'toast'; }, 2800);
-}
-
-// ── NAV BUILDER ──
-function buildNav(tabs, clickFn) {
-  var nav = document.getElementById('navTabs');
-  nav.innerHTML = tabs.map(function(t) {
-    return '<button class="nav-tab" data-id="' + t.id + '" onclick="' + clickFn + '(\'' + t.id + '\')">' + t.label + '</button>';
-  }).join('');
-}
-function setActiveTab(id) {
-  document.querySelectorAll('.nav-tab').forEach(function(t){ t.classList.toggle('active', t.dataset.id === id); });
-}
-function setActivePanel(id) {
-  document.querySelectorAll('.panel').forEach(function(p){ p.classList.toggle('active', p.id === 'panel-' + id); });
-}
-
-// ════════════════════════════════════════════════════════
-//  PROFESSIONAL PORTAL
-// ════════════════════════════════════════════════════════
-var PRO_TABS = [
-  { id:'about', label:'What is Six Stars' },
-  { id:'dimensions', label:'The Six Dimensions' },
-  { id:'curriculum', label:'Training Curriculum' },
-  { id:'apply', label:'Apply Now' },
-  { id:'status', label:'My Application' }
-];
-
-function buildProNav() { buildNav(PRO_TABS, 'showProPanel'); }
-
-function showProPanel(id) {
-  setActiveTab(id);
-  var mc = document.getElementById('mainContent');
-  mc.innerHTML = '';
-  var panel = document.createElement('div');
-  panel.id = 'panel-' + id;
-  panel.className = 'panel active';
-  if (id === 'about')       panel.innerHTML = proAboutHTML();
-  else if (id === 'dimensions') panel.innerHTML = proDimHTML();
-  else if (id === 'curriculum') panel.innerHTML = proModHTML();
-  else if (id === 'apply')  panel.innerHTML = proApplyHTML();
-  else if (id === 'status') panel.innerHTML = proStatusHTML();
-  mc.appendChild(panel);
-}
-
-function proAboutHTML() {
-  return '<div class="sect-eyebrow">About the certification</div>' +
-    '<h2 class="sect-title">The mark earned by the finest craftspeople in the trades.</h2>' +
-    '<p class="sect-body">Six Stars is not a directory listing. It is not a subscription. It is a credential — earned through six rigorous dimensions of assessment, maintained annually, and visible to every homeowner who finds you on the platform. When a client sees the Six Stars badge on your profile, they know you have been held to a standard the industry has never enforced before.</p>' +
-    '<div class="card-grid">' +
-    card('697', 'One-time certification fee', 'Covers all 6 training modules, cohort access, portfolio review, and background verification.') +
-    card('397', 'Annual renewal', 'Badge re-verified every 12 months. New curriculum content. Quarterly masterclass. License and insurance re-confirmed.') +
-    card('6%', 'Platform commission', 'On projects booked through the platform. The cost of a client who already trusts you.') +
-    '</div>' +
-    '<hr class="divider">' +
-    '<div class="sect-eyebrow">The journey</div>' +
-    '<div class="sect-body">Apply below → Identity and license verified → Complete 6 training modules → Join your cohort → Pass assessments → Badge awarded → Your profile goes live on the marketplace.</div>';
-}
-
-function card(val, label, desc) {
-  return '<div class="card"><div style="font-size:1.8rem;font-weight:800;color:var(--gold);margin-bottom:6px">' + val + '</div><div style="font-size:0.85rem;font-weight:600;color:var(--white);margin-bottom:6px">' + label + '</div><div style="font-size:0.78rem;color:var(--muted);line-height:1.6">' + desc + '</div></div>';
-}
-
-function proDimHTML() {
-  var dims = [
-    { icon:'⚒', name:'Star 1 — Craft', desc:'The quality of the work itself. Your portfolio, your license, your trade knowledge — verified.', items:['Portfolio of completed work reviewed','Trade license verified on file','Specialty assessment passed'] },
-    { icon:'🛡', name:'Star 2 — Integrity', desc:'Licensed, insured, honest estimates. Clean record. No surprises for the client, ever.', items:['Insurance certificate on file','Background check cleared','No unresolved disputes on record'] },
-    { icon:'💬', name:'Star 3 — Communication', desc:'Responsive, clear, proactive. Your client is never left wondering what is happening.', items:['Six Stars comm module complete','Response time under 4 hours (verified)','Client survey score 4.5+'] },
-    { icon:'⏱', name:'Star 4 — Reliability', desc:'You show up. You finish. You do exactly what you promised.', items:['90%+ on-time project completion','Zero no-shows in prior 12 months','Estimate accuracy within 10%'] },
-    { icon:'❤', name:'Star 5 — Experience', desc:'How it feels to work with you. The client\'s emotional journey — designed, not accidental.', items:['Six Stars experience training complete','NPS score 70 or above','3+ verified client testimonials'] },
-    { icon:'✦', name:'Star 6 — Legacy', desc:'The lasting result. What the home became. Work that speaks for itself long after you leave.', items:['Before/after documentation submitted','Client referral rate above 40%','Project submitted for anthology review'] }
-  ];
-  return '<div class="sect-eyebrow">The six dimensions</div>' +
-    '<h2 class="sect-title">Six stars. Each one earned independently.</h2>' +
-    '<p class="sect-body">Every dimension is assessed and scored separately. You must earn all six to carry the badge. Each is re-verified annually. If a star falls below standard, it is suspended — and the badge dims until restored.</p>' +
-    '<div class="dim-grid">' + dims.map(function(d) {
-      return '<div class="dim-card"><div class="dim-top"><div class="dim-num"><span style="font-size:15px">' + d.icon + '</span></div><div class="dim-name">' + d.name + '</div></div><div class="dim-desc">' + d.desc + '</div><ul class="dim-items">' + d.items.map(function(i){ return '<li>' + i + '</li>'; }).join('') + '</ul></div>';
-    }).join('') + '</div>';
-}
-
-function proModHTML() {
-  var mods = JSON.parse(localStorage.getItem(SS_CURR) || '[]');
-  return '<div class="sect-eyebrow">Training curriculum</div>' +
-    '<h2 class="sect-title">13 hours. Six modules. One standard.</h2>' +
-    '<p class="sect-body">Modules 1 and 2 are completed solo at your own pace. Modules 3 through 5 run in a cohort of 20–30 professionals — peers who hold each other accountable. Module 6 is earned in the field, after your first completed project on the platform.</p>' +
-    '<div class="mod-list">' + mods.map(function(m) {
-      var lessons = modLessons(m.num);
-      return '<div class="mod-card" onclick="this.classList.toggle(\'open\')">' +
-        '<div class="mod-top"><span class="mod-star">Star ' + m.num + '</span><span class="mod-name">Module ' + m.num + ' — ' + m.name + '</span><span class="mod-time">' + m.time + '</span></div>' +
-        '<div class="mod-body"><div class="mod-tagline">"' + m.tagline + '"</div>' +
-        '<div class="mod-lessons">' + lessons.map(function(l,i){ return '<div class="mod-lesson"><span class="mod-lesson-n">' + (i+1) + '</span>' + l + '</div>'; }).join('') + '</div>' +
-        '<div class="mod-assess">' + modAssess(m.num) + '</div></div></div>';
-    }).join('') + '</div>';
-}
-
-function modLessons(n) {
-  var l = { 1:['The portfolio standard — documenting and curating completed work','Specialty positioning — defining your niche honestly','Trade documentation — permits, compliance, material specs','The craft conversation — speaking the client language'],
-    2:['The promise of the estimate — why accuracy is a long-term business strategy','Scope creep and the change order — handling project expansion honestly','When things go wrong — dispute protocol and client recovery','Contracts and warranties — what every agreement must include'],
-    3:['The client anxiety arc — mapping what they feel from first contact to final walkthrough','The pre-project conversation — setting expectations before work begins','Progress updates that build trust — frequency, format, what to say when behind','Speaking the client language — translating trade vocabulary'],
-    4:['Commitments you can keep — building a schedule that accounts for reality','Your team is your reputation — how subcontractors reflect on your certification','The honest estimate — why padding costs more than it earns','Recovery protocol — when you are behind, the exact steps to take'],
-    5:['The experience architecture — every touchpoint, every feeling, every moment','The welcome protocol — the first hour on site sets everything','Moments that matter — the three touchpoints clients remember most','The reveal — how to present completed work','The relationship after the project — follow-up, check-in, the referral earned'],
-    6:['Documenting your body of work — photography, narrative, before-and-after','The referral culture — why legacy professionals earn referrals, not ask for them','The long view — how each project compounds a professional reputation','Platform anthology submission — nominating your best work'] };
-  return l[n] || [];
-}
-
-function modAssess(n) {
-  var a = { 1:'Submit a portfolio of 5 completed projects with documentation. Reviewed by Six Stars panel within 72 hours.',
-    2:'License and insurance verified. Ethics scenario quiz — three situations, all three must pass.',
-    3:'Cohort roleplay: handle a difficult client scenario live. Platform communication data reviewed after first project.',
-    4:'Historical project data reviewed: on-time rate, estimate accuracy, client feedback. Cohort debrief.',
-    5:'NPS survey collected from a real client. Score of 70 or above required to pass.',
-    6:'Submit one completed project: before/after photos, client testimonial, narrative description. Reviewed for anthology inclusion.' };
-  return a[n] || '';
-}
-
-function proApplyHTML() {
-  return '<div class="sect-eyebrow">Application</div>' +
-    '<h2 class="sect-title">Apply for Six Stars Certification</h2>' +
-    '<p class="sect-body">Complete the form below. Your application will be reviewed within 3 business days. If approved, you will receive your cohort assignment and module access within 48 hours.</p>' +
-    '<form onsubmit="submitApp(event)">' +
-    '<div class="form-grid"><div class="form-group"><label class="form-label">Full Name</label><input class="form-input" id="app-name" required placeholder="Your full name"></div>' +
-    '<div class="form-group"><label class="form-label">Phone Number</label><input class="form-input" id="app-phone" required placeholder="10 digits — becomes your access code" maxlength="10"></div></div>' +
-    '<div class="form-grid"><div class="form-group"><label class="form-label">Primary Specialty</label><select class="form-select" id="app-spec"><option>General Contractor</option><option>Carpentry / Millwork</option><option>Interior Finishes / Tile</option><option>Electrical</option><option>Plumbing</option><option>HVAC</option><option>Painting</option><option>Flooring</option><option>Drywall</option><option>Roofing</option><option>Other</option></select></div>' +
-    '<div class="form-group"><label class="form-label">Trade License Number</label><input class="form-input" id="app-lic" required placeholder="e.g. C-1138945"></div></div>' +
-    '<div class="form-grid"><div class="form-group"><label class="form-label">Years in Trade</label><input class="form-input" id="app-years" type="number" min="1" required placeholder="Years of experience"></div>' +
-    '<div class="form-group"><label class="form-label">Portfolio URL (optional)</label><input class="form-input" id="app-port" placeholder="yoursite.com"></div></div>' +
-    '<div class="form-grid one" style="margin-bottom:16px"><div class="form-group"><label class="form-label">Tell us about your craft</label><textarea class="form-textarea" id="app-bio" placeholder="What do you build? What makes your work different? What do clients say about you?"></textarea></div></div>' +
-    '<div style="margin-bottom:20px"><label class="form-check"><input type="checkbox" id="app-ins" required> I carry current general liability insurance of at least $1M per occurrence</label></div>' +
-    '<div style="margin-bottom:20px"><label class="form-check"><input type="checkbox" id="app-agree" required> I agree to the Six Stars Code of Standards and understand the certification may be revoked for violations</label></div>' +
-    '<button class="btn btn-gold" type="submit">Submit Application</button>' +
-    '</form>';
-}
-
-function submitApp(e) {
-  e.preventDefault();
-  var apps = JSON.parse(localStorage.getItem(SS_APPS) || '[]');
-  var phone = document.getElementById('app-phone').value.trim();
-  if (apps.find(function(a){ return a.phone === phone; })) {
-    toast('An application with this phone number already exists.'); return;
-  }
-  apps.push({ id:'a'+Date.now(), name:document.getElementById('app-name').value, phone:phone, specialty:document.getElementById('app-spec').value, license:document.getElementById('app-lic').value, years:document.getElementById('app-years').value, portfolio:document.getElementById('app-port').value, bio:document.getElementById('app-bio').value, insured:true, status:'pending', applied:new Date().toISOString().slice(0,10), notes:'' });
-  localStorage.setItem(SS_APPS, JSON.stringify(apps));
-  toast('Application submitted. You will hear from us within 3 business days.', 'success');
-  showProPanel('status');
-}
-
-function proStatusHTML() {
-  var phone = sessionStorage.getItem('ss_phone') || '';
-  var apps = JSON.parse(localStorage.getItem(SS_APPS) || '[]');
-  var app = apps.find(function(a){ return a.phone === phone; });
-  if (!app) return '<div class="sect-eyebrow">My application</div><h2 class="sect-title">No application found</h2><p class="sect-body">We do not have an application on file for your phone number. Head to Apply Now to get started.</p><button class="btn btn-gold" onclick="showProPanel(\'apply\')">Apply Now</button>';
-  var colors = { pending:'var(--gold)', approved:'#39c580', denied:'#f85149', info:'#58a6ff' };
-  var labels = { pending:'Under Review', approved:'Approved', denied:'Not Approved', info:'Info Requested' };
-  return '<div class="sect-eyebrow">My application</div>' +
-    '<h2 class="sect-title">Welcome, ' + app.name + '</h2>' +
-    '<div class="card" style="margin-bottom:20px">' +
-    '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">' +
-    '<div style="font-size:0.82rem;color:var(--muted)">Application status</div>' +
-    '<span class="pill pill-' + app.status + '">' + (labels[app.status]||app.status) + '</span></div>' +
-    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;font-size:0.8rem">' +
-    '<div><div style="color:var(--muted);font-size:0.68rem;margin-bottom:3px">Specialty</div><div style="color:var(--white)">' + app.specialty + '</div></div>' +
-    '<div><div style="color:var(--muted);font-size:0.68rem;margin-bottom:3px">License</div><div style="color:var(--white)">' + app.license + '</div></div>' +
-    '<div><div style="color:var(--muted);font-size:0.68rem;margin-bottom:3px">Applied</div><div style="color:var(--white)">' + app.applied + '</div></div>' +
-    '<div><div style="color:var(--muted);font-size:0.68rem;margin-bottom:3px">Years in trade</div><div style="color:var(--white)">' + app.years + '</div></div>' +
-    '</div>' + (app.notes ? '<div style="margin-top:14px;font-size:0.78rem;color:#58a6ff;background:rgba(88,166,255,0.08);border:1px solid rgba(88,166,255,0.2);border-radius:8px;padding:10px 12px"><strong>Note from reviewer:</strong> ' + app.notes + '</div>' : '') +
-    '</div>' +
-    (app.status === 'approved' ? '<div class="card" style="border-color:rgba(200,134,10,0.3);background:rgba(200,134,10,0.07)"><div style="font-size:1rem;font-weight:700;color:var(--gold);margin-bottom:6px">Application approved — welcome to the cohort.</div><div style="font-size:0.82rem;color:var(--muted);line-height:1.6">Your module access will be shared via email within 48 hours. Your cohort assignment will follow. The journey to Six Stars begins now.</div></div>' : '');
-}
-
-// ════════════════════════════════════════════════════════
-//  INVESTOR PORTAL
-// ════════════════════════════════════════════════════════
-var INV_TABS = [
-  { id:'overview', label:'Overview' },
-  { id:'certification', label:'The Certification' },
-  { id:'revenue', label:'Revenue Model' },
-  { id:'market', label:'Market Opportunity' }
-];
-function buildInvestorNav() { buildNav(INV_TABS, 'showInvestorPanel'); }
-
-function showInvestorPanel(id) {
-  setActiveTab(id);
-  var mc = document.getElementById('mainContent');
-  mc.innerHTML = '';
-  var panel = document.createElement('div');
-  panel.className = 'panel active';
-  if (id === 'overview')       panel.innerHTML = invOverviewHTML();
-  else if (id === 'certification') panel.innerHTML = invCertHTML();
-  else if (id === 'revenue')   panel.innerHTML = invRevHTML();
-  else if (id === 'market')    panel.innerHTML = invMarketHTML();
-  mc.appendChild(panel);
-}
-
-function invOverviewHTML() {
-  return '<div class="inv-hero">' +
-    '<div style="display:flex;justify-content:center;gap:6px;margin-bottom:20px">' +
-    [1,2,3,4,5,6].map(function(){ return '<svg width="20" height="20" viewBox="0 0 20 20" fill="var(--gold)"><path d="M10 1l1.8 5.6H17l-4.7 3.4 1.8 5.6L10 12.2l-4.1 3.4 1.8-5.6L3 6.6h5.2z"/></svg>'; }).join('') +
-    '</div>' +
-    '<h1>Six Stars is the quality standard the trades have never had.</h1>' +
-    '<p>A certification platform that vets, trains, and badges the finest craftspeople in home renovation — creating a trusted marketplace where homeowners find professionals they can rely on, and professionals earn more by proving they deserve it.</p></div>' +
-    '<div class="opp-grid">' +
-    oppCard('$500B+', 'US home renovation market annually') +
-    oppCard('0', 'Universal craft certification standards that exist today') +
-    oppCard('6', 'Rigorous dimensions every professional must earn') +
-    oppCard('$397', 'Annual renewal per certified professional') +
-    '</div>' +
-    '<hr class="divider">' +
-    '<div class="sect-eyebrow">The problem</div>' +
-    '<h2 class="sect-title">The trades have a trust crisis.</h2>' +
-    '<p class="sect-body">Homeowners have no reliable way to distinguish a master craftsperson from someone who bought a contractor license last month. Review platforms show averages. Directories sell placement. Nobody enforces standards. Six Stars changes that — not with reviews, but with a rigorous, independently assessed certification that professionals earn and must maintain annually.</p>' +
-    '<div class="sect-eyebrow">The solution</div>' +
-    '<h2 class="sect-title">The certification the industry has been waiting for.</h2>' +
-    '<p class="sect-body">Six Stars certifies professionals across six dimensions — Craft, Integrity, Communication, Reliability, Experience, and Legacy. Each is independently scored. All six must be earned to carry the badge. The badge is re-verified annually. It can be suspended. It can be revoked. That is what makes it mean something.</p>';
-}
-
-function oppCard(val, label) {
-  return '<div class="opp-card"><div class="opp-num">' + val + '</div><div class="opp-label">' + label + '</div></div>';
-}
-
-function invCertHTML() {
-  return '<div class="sect-eyebrow">The certification</div>' +
-    '<h2 class="sect-title">Six dimensions. One mark. Verified annually.</h2>' +
-    '<p class="sect-body">The Six Stars badge is binary — you have it or you do not. There are no partial certifications, no paid upgrades. Each of the six dimensions is assessed through a combination of verified data, training completion, and real-world performance tracking.</p>' +
-    '<div class="dim-grid">' +
-    [['⚒','Craft','Portfolio review, license verification, specialty assessment'],['🛡','Integrity','Background check, insurance verification, dispute history'],['💬','Communication','Training module, response time tracking, client survey scores'],['⏱','Reliability','On-time completion rate, estimate accuracy, no-show record'],['❤','Experience','Six Stars training curriculum, NPS score 70+, verified testimonials'],['✦','Legacy','Before/after documentation, referral rate, anthology submission']].map(function(d) {
-      return '<div class="dim-card"><div class="dim-top"><div class="dim-num"><span style="font-size:15px">' + d[0] + '</span></div><div class="dim-name">' + d[1] + '</div></div><div class="dim-desc">' + d[2] + '</div></div>';
-    }).join('') + '</div>' +
-    '<hr class="divider">' +
-    '<div class="sect-eyebrow">The curriculum</div>' +
-    '<h2 class="sect-title">13 hours of training. Built around the Six Stars framework.</h2>' +
-    '<p class="sect-body">Modules 1 and 2 are self-paced. Modules 3–5 run in cohorts of 20–30 professionals — the cohort model creates accountability and community that self-paced video never achieves. Module 6 is earned only after a real completed project. Total time to certification: 6–10 weeks.</p>';
-}
-
-function invRevHTML() {
-  return '<div class="sect-eyebrow">Revenue model</div>' +
-    '<h2 class="sect-title">Three streams. Recurring at the core.</h2>' +
-    '<p class="sect-body">The business is built on certification fees, annual renewals, and a platform commission on booked projects. The renewal is the engine — it scales with the certified professional base and requires no additional cost to deliver.</p>' +
-    '<div class="metric-grid">' +
-    metricCard('$697', 'Certification fee', 'One-time · per professional', false) +
-    metricCard('$397', 'Annual renewal', 'Recurring · per professional', true) +
-    metricCard('6%', 'Platform commission', 'Per project booked', false) +
-    metricCard('$2,500+', 'Team / enterprise', 'Firms certifying whole crews', false) +
-    '</div>' +
-    '<hr class="divider">' +
-    '<div class="sect-eyebrow">Year-over-year projection</div>' +
-    '<div class="card" style="margin-bottom:28px">' +
-    revRow('Year 1 — 300 certified professionals', 480900, 1200000) +
-    revRow('Year 2 — 750 certified professionals', 936150, 1200000) +
-    revRow('Year 3 — 1,500 certified professionals', 1619700, 1200000) +
-    '</div>' +
-    '<p style="font-size:0.75rem;color:var(--muted);margin-bottom:28px">Projection assumes $697 initial certification, $397 annual renewal, 30 new certifications/month, average 6 projects/year per professional at $12,000 average project value. Commission not included above.</p>' +
-    '<div class="sect-eyebrow">The flywheel</div>' +
-    '<div class="card"><div style="font-size:0.85rem;font-weight:600;color:var(--white);margin-bottom:14px">Why it compounds</div>' +
-    '<div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center">' +
-    ['Homeowner trusts badge','Hires Six Stars professional','Platform earns commission','Professional earns more','More professionals seek certification','Badge becomes more trusted'].map(function(s,i,a){ return '<span style="font-size:0.75rem;color:var(--muted);background:rgba(255,255,255,0.05);border-radius:20px;padding:5px 12px;border:1px solid var(--border)">' + s + '</span>' + (i<a.length-1?'<span style="color:var(--gold);font-size:0.8rem">→</span>':''); }).join('') +
-    '</div></div>';
-}
-
-function metricCard(val, label, sub, isGold) {
-  return '<div class="metric-card' + (isGold?' gold':'') + '"><div class="metric-label">' + label + '</div><div class="metric-val">' + val + '</div><div class="metric-sub">' + sub + '</div></div>';
-}
-
-function revRow(label, val, max) {
-  var pct = Math.round((val/max)*100);
-  var fmt = '$' + val.toLocaleString();
-  return '<div class="rev-row"><div class="rev-label">' + label + '</div><div class="rev-track"><div class="rev-bar" style="width:' + pct + '%"></div></div><div class="rev-val">' + fmt + '</div></div>';
-}
-
-function invMarketHTML() {
-  return '<div class="sect-eyebrow">Market opportunity</div>' +
-    '<h2 class="sect-title">A $500B market with no quality standard.</h2>' +
-    '<p class="sect-body">The US home renovation and remodeling market exceeded $500 billion in 2024 and continues to grow as housing stock ages and homeowners invest in place. Yet no universal certification standard exists for the tradespeople who deliver this work. Six Stars is built to become that standard.</p>' +
-    '<div class="opp-grid">' +
-    oppCard('$500B+', 'US renovation market (2024)') +
-    oppCard('3.5M', 'Licensed contractors in the US') +
-    oppCard('72%', 'Homeowners who say trust is top factor in hiring') +
-    oppCard('$0', 'Universal trade certification revenue captured today') +
-    '</div>' +
-    '<hr class="divider">' +
-    '<div class="sect-eyebrow">Strategic positioning</div>' +
-    '<h2 class="sect-title">Not a directory. Not a lead-gen platform. A standard.</h2>' +
-    '<p class="sect-body">Angi, HomeAdvisor, and Thumbtack sell access. Six Stars sells trust. The certification is platform-agnostic — a Six Stars badge can appear on any marketplace, on a professional\'s own website, or on physical materials. The platform enforces the standard. The badge travels everywhere.</p>' +
-    '<div class="card-grid">' +
-    card('Platform-agnostic', 'The badge travels beyond the marketplace', 'A Six Stars professional can display their certification anywhere. This is not a walled garden — it is a universal quality mark.') +
-    card('B2B expansion', 'Developers, insurers, supply chains', 'Real estate developers can require Six Stars for contractor lists. Insurers can offer premium discounts. Supply partners can offer trade pricing.') +
-    card('Recurring IP', 'The curriculum is the moat', 'The Six Stars training methodology — built around six proven dimensions of professional excellence — is proprietary. It cannot be replicated without the framework.') +
-    '</div>';
-}
-
-// ════════════════════════════════════════════════════════
-//  ADMIN CONSOLE
-// ════════════════════════════════════════════════════════
-var ADMIN_TABS = [
-  { id:'dashboard', label:'Dashboard' },
-  { id:'applications', label:'Applications' },
-  { id:'professionals', label:'Professionals' },
-  { id:'cohorts', label:'Cohorts' },
-  { id:'revenue', label:'Revenue' },
-  { id:'curriculum', label:'Curriculum' }
-];
-function buildAdminNav() { buildNav(ADMIN_TABS, 'showAdminPanel'); }
-
-function showAdminPanel(id) {
-  setActiveTab(id);
-  var mc = document.getElementById('mainContent');
-  mc.innerHTML = '';
-  var panel = document.createElement('div');
-  panel.className = 'panel active';
-  if (id === 'dashboard')    panel.innerHTML = adminDashHTML();
-  else if (id === 'applications') panel.innerHTML = adminAppsHTML();
-  else if (id === 'professionals') panel.innerHTML = adminProsHTML();
-  else if (id === 'cohorts') panel.innerHTML = adminCohHTML();
-  else if (id === 'revenue') panel.innerHTML = adminRevHTML();
-  else if (id === 'curriculum') panel.innerHTML = adminCurrHTML();
-  mc.appendChild(panel);
-}
-
-function adminDashHTML() {
-  var apps = JSON.parse(localStorage.getItem(SS_APPS)||'[]');
-  var pros = JSON.parse(localStorage.getItem(SS_PROS)||'[]');
-  var cohs = JSON.parse(localStorage.getItem(SS_COH)||'[]');
-  var pending = apps.filter(function(a){return a.status==='pending';}).length;
-  var certified = pros.filter(function(p){return p.status==='certified';}).length;
-  var activeCohs = cohs.filter(function(c){return c.status==='active';}).length;
-  var certRev = apps.filter(function(a){return a.status==='approved';}).length * 697;
-  var renewRev = certified * 397;
-  return '<div class="sect-eyebrow">Admin Console</div>' +
-    '<h2 class="sect-title">Six Stars — Overview</h2>' +
-    '<div class="metric-grid">' +
-    metricCard(pending, 'Pending applications', 'Awaiting review', false) +
-    metricCard(apps.length, 'Total applications', 'All time', false) +
-    metricCard(certified, 'Certified professionals', 'Active badges', true) +
-    metricCard(activeCohs, 'Active cohorts', 'In training', false) +
-    metricCard('$' + certRev.toLocaleString(), 'Certification revenue', 'All time', false) +
-    metricCard('$' + renewRev.toLocaleString(), 'Annual renewal value', 'Current base', true) +
-    '</div>' +
-    '<hr class="divider">' +
-    '<div class="sect-eyebrow">Recent applications</div>' +
-    '<div class="tbl-wrap"><table><thead><tr><th>Name</th><th>Specialty</th><th>Applied</th><th>Status</th><th>Action</th></tr></thead><tbody>' +
-    apps.slice(-5).reverse().map(function(a){
-      return '<tr><td class="td-name">' + a.name + '</td><td>' + a.specialty + '</td><td>' + a.applied + '</td><td><span class="pill pill-' + a.status + '">' + a.status + '</span></td><td><button class="btn btn-ghost btn-sm" onclick="showAdminPanel(\'applications\')">Review</button></td></tr>';
-    }).join('') + '</tbody></table></div>';
-}
-
-function adminAppsHTML() {
-  var apps = JSON.parse(localStorage.getItem(SS_APPS)||'[]');
-  return '<div class="sect-eyebrow">Applications</div>' +
-    '<div class="action-row"><h2 class="sect-title" style="margin-bottom:0">All Applications</h2></div>' +
-    '<div class="tbl-wrap"><table><thead><tr><th>Name</th><th>Phone</th><th>Specialty</th><th>License</th><th>Years</th><th>Insured</th><th>Applied</th><th>Status</th><th>Actions</th></tr></thead><tbody>' +
-    apps.map(function(a){
-      return '<tr><td class="td-name">' + a.name + '</td><td style="font-family:monospace;font-size:0.78rem">' + a.phone + '</td><td>' + a.specialty + '</td><td style="font-family:monospace;font-size:0.78rem">' + a.license + '</td><td>' + a.years + '</td><td>' + (a.insured?'✓':'✗') + '</td><td>' + a.applied + '</td>' +
-        '<td><span class="pill pill-' + a.status + '">' + a.status + '</span></td>' +
-        '<td><div style="display:flex;gap:6px;flex-wrap:wrap">' +
-        (a.status==='pending'?'<button class="btn btn-gold btn-sm" onclick="appAction(\'' + a.id + '\',\'approved\')">Approve</button><button class="btn btn-ghost btn-sm" onclick="appNote(\'' + a.id + '\')">Info</button><button class="btn btn-danger btn-sm" onclick="appAction(\'' + a.id + '\',\'denied\')">Deny</button>':'') +
-        (a.status==='approved'?'<button class="btn btn-ghost btn-sm" onclick="certifyPro(\'' + a.id + '\')">Certify</button>':'') +
-        '</div></td></tr>';
-    }).join('') + '</tbody></table></div>';
-}
-
-function appAction(id, status) {
-  var apps = JSON.parse(localStorage.getItem(SS_APPS)||'[]');
-  var a = apps.find(function(x){return x.id===id;});
-  if (a) { a.status = status; localStorage.setItem(SS_APPS, JSON.stringify(apps)); toast('Application ' + status, 'success'); showAdminPanel('applications'); }
-}
-
-function appNote(id) {
-  var note = prompt('Enter note for applicant:');
-  if (note) {
-    var apps = JSON.parse(localStorage.getItem(SS_APPS)||'[]');
-    var a = apps.find(function(x){return x.id===id;});
-    if (a) { a.status = 'info'; a.notes = note; localStorage.setItem(SS_APPS, JSON.stringify(apps)); toast('Note sent', 'success'); showAdminPanel('applications'); }
-  }
-}
-
-function certifyPro(appId) {
-  var apps = JSON.parse(localStorage.getItem(SS_APPS)||'[]');
-  var a = apps.find(function(x){return x.id===appId;});
-  if (!a) return;
-  var pros = JSON.parse(localStorage.getItem(SS_PROS)||'[]');
-  if (pros.find(function(p){return p.phone===a.phone;})) { toast('Already certified.'); return; }
-  var today = new Date().toISOString().slice(0,10);
-  var renewal = new Date(); renewal.setFullYear(renewal.getFullYear()+1);
-  pros.push({ id:'p'+Date.now(), name:a.name, specialty:a.specialty, phone:a.phone, certified:today, renewal:renewal.toISOString().slice(0,10), status:'certified', stars:{craft:80,integrity:90,communication:75,reliability:85,experience:70,legacy:0} });
-  localStorage.setItem(SS_PROS, JSON.stringify(pros));
-  toast(a.name + ' certified!', 'success');
-  showAdminPanel('professionals');
-}
-
-function adminProsHTML() {
-  var pros = JSON.parse(localStorage.getItem(SS_PROS)||'[]');
-  return '<div class="sect-eyebrow">Certified Professionals</div>' +
-    '<div class="action-row"><h2 class="sect-title" style="margin-bottom:0">' + pros.length + ' Certified</h2></div>' +
-    '<div style="display:flex;flex-direction:column;gap:14px">' +
-    pros.map(function(p){
-      var s = p.stars;
-      return '<div class="card"><div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:10px">' +
-        '<div><div style="font-size:0.95rem;font-weight:700;color:var(--white)">' + p.name + '</div><div style="font-size:0.78rem;color:var(--muted);margin-top:2px">' + p.specialty + ' · Certified ' + p.certified + ' · Renewal ' + p.renewal + '</div></div>' +
-        '<div style="display:flex;gap:8px;align-items:center"><span class="pill pill-' + p.status + '">' + p.status + '</span>' +
-        '<button class="btn btn-ghost btn-sm" onclick="suspendPro(\'' + p.id + '\')">Suspend</button></div></div>' +
-        '<div class="star-bars">' +
-        Object.entries(s).map(function(e){ return '<div class="star-row"><div class="star-dim">' + e[0].charAt(0).toUpperCase()+e[0].slice(1) + '</div><div class="star-track"><div class="star-fill" style="width:' + e[1] + '%"></div></div><div class="star-score">' + e[1] + '</div></div>'; }).join('') +
-        '</div></div>';
-    }).join('') + '</div>';
-}
-
-function suspendPro(id) {
-  var pros = JSON.parse(localStorage.getItem(SS_PROS)||'[]');
-  var p = pros.find(function(x){return x.id===id;});
-  if (p) { p.status = p.status==='certified'?'suspended':'certified'; localStorage.setItem(SS_PROS,JSON.stringify(pros)); toast('Status updated','success'); showAdminPanel('professionals'); }
-}
-
-function adminCohHTML() {
-  var cohs = JSON.parse(localStorage.getItem(SS_COH)||'[]');
-  return '<div class="sect-eyebrow">Cohorts</div>' +
-    '<div class="action-row"><h2 class="sect-title" style="margin-bottom:0">Cohort Management</h2><button class="btn btn-gold" onclick="addCohort()">+ New Cohort</button></div>' +
-    '<div class="cohort-grid">' +
-    cohs.map(function(c){
-      return '<div class="cohort-card"><div class="cohort-name">' + c.name + '</div>' +
-        '<div class="cohort-dates">' + c.start + ' → ' + c.grad + ' · <span class="pill pill-' + (c.status==='graduated'?'approved':'pending') + '">' + c.status + '</span></div>' +
-        '<div class="cohort-progress"><div class="cohort-prog-label">Progress: ' + c.progress + '%</div><div class="cohort-track"><div class="cohort-fill" style="width:' + c.progress + '%"></div></div></div>' +
-        '<div class="cohort-members">' + c.members.map(function(m){return '<span class="cohort-member">' + m + '</span>';}).join('') + '</div></div>';
-    }).join('') + '</div>';
-}
-
-function addCohort() {
-  var name = prompt('Cohort name (e.g. Cohort 03 — Fall 2026):');
-  if (!name) return;
-  var cohs = JSON.parse(localStorage.getItem(SS_COH)||'[]');
-  cohs.push({ id:'c'+Date.now(), name:name, start:new Date().toISOString().slice(0,10), grad:'', members:[], progress:0, status:'active' });
-  localStorage.setItem(SS_COH, JSON.stringify(cohs));
-  toast('Cohort created','success');
-  showAdminPanel('cohorts');
-}
-
-function adminRevHTML() {
-  var pros = JSON.parse(localStorage.getItem(SS_PROS)||'[]');
-  var apps = JSON.parse(localStorage.getItem(SS_APPS)||'[]');
-  var certified = pros.filter(function(p){return p.status==='certified';}).length;
-  var approved = apps.filter(function(a){return a.status==='approved';}).length;
-  var certRev = approved * 697;
-  var renewRev = certified * 397;
-  var commEst = certified * 6 * 12000 * 0.06;
-  var total = certRev + renewRev + commEst;
-  return '<div class="sect-eyebrow">Revenue</div>' +
-    '<h2 class="sect-title">Revenue Dashboard</h2>' +
-    '<div class="metric-grid">' +
-    metricCard('$'+certRev.toLocaleString(),'Certification revenue','All time · $697 per approval',false) +
-    metricCard('$'+renewRev.toLocaleString(),'Annual renewal run-rate','Current base · $397 each',true) +
-    metricCard('$'+Math.round(commEst).toLocaleString(),'Commission estimate','6% · 6 proj/yr · $12k avg',false) +
-    metricCard('$'+Math.round(total).toLocaleString(),'Total estimated annual','Combined streams',true) +
-    '</div>' +
-    '<hr class="divider">' +
-    '<div class="sect-eyebrow">Stream breakdown</div>' +
-    '<div class="card" style="margin-bottom:24px">' +
-    revRow('Certification fees', certRev, total||1) +
-    revRow('Annual renewals', renewRev, total||1) +
-    revRow('Platform commissions (est.)', Math.round(commEst), total||1) +
-    '</div>' +
-    '<div class="sect-eyebrow">Renewals due — next 90 days</div>' +
-    '<div class="tbl-wrap"><table><thead><tr><th>Professional</th><th>Certified</th><th>Renewal Due</th><th>Status</th></tr></thead><tbody>' +
-    pros.map(function(p){ return '<tr><td class="td-name">'+p.name+'</td><td>'+p.certified+'</td><td>'+p.renewal+'</td><td><span class="pill pill-'+p.status+'">'+p.status+'</span></td></tr>'; }).join('') +
-    '</tbody></table></div>';
-}
-
-function adminCurrHTML() {
-  var mods = JSON.parse(localStorage.getItem(SS_CURR)||'[]');
-  return '<div class="sect-eyebrow">Curriculum</div>' +
-    '<h2 class="sect-title">Module Management</h2>' +
-    '<p class="sect-body" style="margin-bottom:20px">Toggle modules live or draft. Unpublished modules are hidden from professional applicants but visible here. Last-updated dates track content revisions.</p>' +
-    '<div class="curr-list">' +
-    mods.map(function(m){
-      return '<div class="curr-card">' +
-        '<div class="curr-num">' + m.num + '</div>' +
-        '<div class="curr-info"><div class="curr-name">Module ' + m.num + ' — ' + m.name + '</div>' +
-        '<div class="curr-meta">' + m.time + ' · ' + m.format + ' · Updated ' + m.updated + '</div></div>' +
-        '<div class="curr-actions">' +
-        '<span style="font-size:0.72rem;color:var(--muted);margin-right:4px">' + (m.published?'Live':'Draft') + '</span>' +
-        '<label class="toggle-switch"><input type="checkbox"' + (m.published?' checked':'') + ' onchange="toggleMod(\'' + m.id + '\',this.checked)"><span class="toggle-slider"></span></label>' +
-        '<button class="btn btn-ghost btn-sm" onclick="editModTagline(\'' + m.id + '\')">Edit</button>' +
-        '</div></div>';
-    }).join('') + '</div>';
-}
-
-function toggleMod(id, val) {
-  var mods = JSON.parse(localStorage.getItem(SS_CURR)||'[]');
-  var m = mods.find(function(x){return x.id===id;});
-  if (m) { m.published = val; m.updated = new Date().toISOString().slice(0,10); localStorage.setItem(SS_CURR,JSON.stringify(mods)); toast(m.name + ' module ' + (val?'published':'set to draft'),'success'); }
-}
-
-function editModTagline(id) {
-  var mods = JSON.parse(localStorage.getItem(SS_CURR)||'[]');
-  var m = mods.find(function(x){return x.id===id;});
-  if (!m) return;
-  var t = prompt('Module tagline:', m.tagline);
-  if (t) { m.tagline = t; m.updated = new Date().toISOString().slice(0,10); localStorage.setItem(SS_CURR,JSON.stringify(mods)); toast('Module updated','success'); showAdminPanel('curriculum'); }
-}
-
-// ── INIT ──
-checkSession();
+  if (sessionStorage.getItem(SESSION_KEY)) openSite();
 </script>
 </body>
 </html>
