@@ -508,7 +508,8 @@ const SB_URL = 'https://ldhgxfsklorqzktuodmk.supabase.co';
 let   SB_KEY = localStorage.getItem('ss_admin_sb_key') || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxkaGd4ZnNrbG9ycXprdHVvZG1rIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ5MTg3NTYsImV4cCI6MjEwMDQ5NDc1Nn0.BTOboRCzCa2Mcv8V4kTZjuvNFYbejor1P3dQXXbKRLM';
 
 // Admin credentials (stored in localStorage after first save)
-let ADMIN_EMAIL = localStorage.getItem('ss_admin_email') || 'mikelwalton@outlook.com';
+const ADMIN_EMAILS = ['mikelwalton@outlook.com', 'jonmikelwalton@gmail.com'];
+let ADMIN_EMAIL = ADMIN_EMAILS[0];
 let ADMIN_PASS  = localStorage.getItem('ss_admin_pass')  || 'SixStarsAdmin2026!';
 
 // Site gate credentials
@@ -557,9 +558,9 @@ function adminLogin() {
   const err   = document.getElementById('gate-err');
   err.textContent = '';
   if (!email || !pass) { err.textContent = 'Enter your email and password.'; return; }
-  if (email === ADMIN_EMAIL.toLowerCase() && pass === ADMIN_PASS) {
+  if (ADMIN_EMAILS.indexOf(email) !== -1 && pass === ADMIN_PASS) {
     currentAdmin = email;
-    sessionStorage.setItem('ss_admin_session', '1');
+    sessionStorage.setItem('ss_admin_session', email);
     document.getElementById('gate').style.display = 'none';
     document.getElementById('shell').style.display = 'block';
     document.getElementById('admin-name').textContent = email;
@@ -585,10 +586,11 @@ function adminLogout() {
 }
 
 if (sessionStorage.getItem('ss_admin_session')) {
-  currentAdmin = ADMIN_EMAIL;
+  currentAdmin = sessionStorage.getItem('ss_admin_session');
+  if (currentAdmin === '1') currentAdmin = ADMIN_EMAIL;
   document.getElementById('gate').style.display = 'none';
   document.getElementById('shell').style.display = 'block';
-  document.getElementById('admin-name').textContent = ADMIN_EMAIL;
+  document.getElementById('admin-name').textContent = currentAdmin;
   if (!initDB()) document.getElementById('setup-banner').classList.remove('hidden');
   loadDashboard();
   renderStarEditor();
